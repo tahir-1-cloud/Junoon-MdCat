@@ -1,0 +1,8 @@
+.vs/
+obj/
+*.user
+*.http
+bin/
+.idea/
+.next/
+node_modules/
