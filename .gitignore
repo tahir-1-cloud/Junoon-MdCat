@@ -7,3 +7,4 @@ bin/
 .next/
 node_modules/
 StudyApp/StudyApp.API/appsettings.json
+study-app-frontend/.env.local
