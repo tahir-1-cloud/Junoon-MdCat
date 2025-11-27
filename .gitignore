@@ -6,3 +6,4 @@ bin/
 .idea/
 .next/
 node_modules/
+StudyApp/StudyApp.API/appsettings.json
