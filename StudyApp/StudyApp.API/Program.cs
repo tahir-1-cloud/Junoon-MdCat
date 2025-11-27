@@ -25,6 +25,8 @@ builder.Services.AddScoped<IOptionRepository, OptionRepository>();
 builder.Services.AddScoped<IMockRepository, MockRepository>();
 builder.Services.AddScoped<IMockQuestionRepository, MockQuestionRepository>();
 builder.Services.AddScoped<IMockOptionRepository, MockOptionRepository>();
+builder.Services.AddScoped<IStudentEnrollRepository, StudentEnrollRepository>();
+
 // Register Services
 builder.Services.AddScoped<IAuthenticationServices, AuthenticationServices>();
 builder.Services.AddScoped<ISessionServices, SessionServices>();
@@ -34,6 +36,7 @@ builder.Services.AddScoped<IOptionServices, OptionServices>();
 builder.Services.AddScoped<IMockServices, MockServices>();
 builder.Services.AddScoped<IMockQuestionServices, MockQuestionServices>();
 builder.Services.AddScoped<IMockOptionServices, MockOptionServices>();
+builder.Services.AddScoped<IStudentEnrollServices, StudentEnrollServices>();
 
 
 // Mapster config

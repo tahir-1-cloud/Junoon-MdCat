@@ -20,6 +20,8 @@ namespace StudyApp.API.Data
         public DbSet<MockQuestion> MockQuestions { get; set; }
 
         public DbSet<MockOption> MockOptions { get; set; }
+
+        public DbSet<StudentEnrollment> StudentEnrollments { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -31,6 +33,7 @@ namespace StudyApp.API.Data
             modelBuilder.Entity<Question>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<Option>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<UserLogin>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<StudentEnrollment>().HasQueryFilter(x => !x.IsDeleted);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

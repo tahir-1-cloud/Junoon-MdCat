@@ -8,7 +8,7 @@
         public int MockTestId { get; set; }
 
         // Enable lazy loading of the Paper reference
-        public virtual MockTest Paper { get; set; }
+        public virtual MockTest MockTest { get; set; }
 
         public virtual ICollection<MockOption> MockOptions { get; set; } = new List<MockOption>();
     }
