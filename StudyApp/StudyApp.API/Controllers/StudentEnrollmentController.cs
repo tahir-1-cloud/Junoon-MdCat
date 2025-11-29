@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using StudyApp.API.Models;
 using StudyApp.API.Services.Interfaces;
 
 namespace StudyApp.API.Controllers
@@ -15,7 +16,7 @@ namespace StudyApp.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> StudentEnroll([FromBody] Models.StudentEnrollModel model)
+        public async Task<IActionResult> StudentEnroll([FromBody] StudentEnrollModel model)
         {
             try
             {

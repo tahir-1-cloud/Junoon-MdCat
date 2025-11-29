@@ -20,6 +20,7 @@ namespace StudyApp.API.Services.Implementations
                 FullName = model.FullName,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
+                City=model.City,
                 PreferredCourse = model.PreferredCourse,
                 Status = "Pending",
                 CreatedAt = DateTime.UtcNow

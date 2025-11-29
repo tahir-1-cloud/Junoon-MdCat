@@ -8,6 +8,9 @@ import { getActiveSessions } from '@/services/sessionService';
 import { addStudent } from '@/services/userService';
 import { DatePicker } from "antd";
 import dayjs from 'dayjs';
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(customParseFormat);
 
 export default function AddStudentPage() {
     const router = useRouter();
@@ -96,14 +99,21 @@ export default function AddStudentPage() {
 
             <div>
                 <label className="block mb-1 font-medium text-gray-700">Date of Birth</label>
-                <DatePicker
+               <DatePicker
                 value={formData.dob ? dayjs(formData.dob) : null}
-                onChange={(_, dateString) => handleChange(dateString as string, "dob")}
+                onChange={(date) => {
+                    if (date) {
+                    const iso = date.toDate().toISOString();  
+                    handleChange(iso, "dob");
+                    } else {
+                    handleChange("", "dob");
+                    }
+                }}
                 format="DD-MM-YYYY"
-                 className="w-full border border-gray-300 rounded-lg px-4 py-[9px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                 style={{ height: "40px" }}
-               
+                className="w-full border border-gray-300 rounded-lg px-4 py-[9px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                style={{ height: "40px" }}
                 />
+
             </div>
 
             <Input name="password" label="Password" type="password" value={formData.password} onChange={handleChange} />
