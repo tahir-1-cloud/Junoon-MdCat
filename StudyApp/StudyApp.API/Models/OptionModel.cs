@@ -4,6 +4,8 @@
     {
         public long Id { get; set; }
         public string OptionText { get; set; }
+        public string? IsCorrect { get; set; }
+
     }
 
     public class CreateOptionModel

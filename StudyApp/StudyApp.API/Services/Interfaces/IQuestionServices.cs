@@ -8,5 +8,6 @@ namespace StudyApp.API.Services.Interfaces
         Task AddQuestion(CreateQuestionModel question);
 
         Task<List<QuestionModel>> GetQuestionsForPaperAsync(int paperId);
+        Task DeleteQuestionAsync(int questionId);
     }
 }

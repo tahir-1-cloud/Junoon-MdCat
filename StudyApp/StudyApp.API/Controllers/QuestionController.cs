@@ -37,5 +37,24 @@ namespace StudyApp.API.Controllers
             var questions = await _questionServices.GetQuestionsForPaperAsync(paperId);
             return Ok(questions);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteQuestion(int id)
+        {
+            try
+            {
+                await _questionServices.DeleteQuestionAsync(id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException knf)
+            {
+                return NotFound(knf.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

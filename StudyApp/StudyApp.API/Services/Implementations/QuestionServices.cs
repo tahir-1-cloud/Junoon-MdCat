@@ -41,5 +41,10 @@ namespace StudyApp.API.Services.Implementations
             List<QuestionModel> questionModels = questions.Adapt<List<QuestionModel>>();
             return questionModels;
         }
+        public async Task DeleteQuestionAsync(int questionId)
+        {
+            // Let repository handle the retrieval and soft-delete
+            await _questionRepository.DeleteQuestionAsync(questionId);
+        }
     }
 }

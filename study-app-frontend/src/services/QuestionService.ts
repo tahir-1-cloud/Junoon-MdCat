@@ -36,5 +36,10 @@ export const QuestionService = {
             `/Question/GetQuestionsForPaper/${paperId}`
         );
         return data;
+    },
+    async deleteQuestion(questionId: number): Promise<void> {
+        await axiosInstance.delete(`/Question/DeleteQuestion/${questionId}`);
     }
+
+    
 };

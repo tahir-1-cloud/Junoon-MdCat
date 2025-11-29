@@ -6,5 +6,6 @@ namespace StudyApp.API.Domain.Interfaces
     {
         Task<Question> AddQuestionWithOptionsAsync(Question question);
         Task<List<Question>> GetQuestionsByPaperIdAsync(int paperId);
+        Task DeleteQuestionAsync(int questionId);
     }
 }
