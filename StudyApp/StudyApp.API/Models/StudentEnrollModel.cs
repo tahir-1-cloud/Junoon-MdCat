@@ -8,5 +8,7 @@
 
         public string? City { get; set; }
         public string PreferredCourse { get; set; }
+
+        public string Status { get; set; }
     }
 }

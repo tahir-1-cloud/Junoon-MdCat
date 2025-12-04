@@ -1,4 +1,5 @@
-﻿using StudyApp.API.Domain.Entities;
+﻿using Mapster;
+using StudyApp.API.Domain.Entities;
 using StudyApp.API.Domain.Interfaces;
 using StudyApp.API.Models;
 using StudyApp.API.Repositories;
@@ -12,6 +13,12 @@ namespace StudyApp.API.Services.Implementations
         public StudentEnrollServices(IStudentEnrollRepository studentEnrollRepository)
         {
             _studentEnrollRepository = studentEnrollRepository;
+        }
+
+        public async Task<IEnumerable<StudentEnrollModel>> GetEnrollStudents()
+        {
+            IEnumerable<StudentEnrollment> enumerable = await _studentEnrollRepository.GetAsync();
+            return enumerable.Adapt<IEnumerable<StudentEnrollModel>>();
         }
         public async Task AddEnrollmentAsync(StudentEnrollModel model)
         {

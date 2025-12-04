@@ -5,5 +5,7 @@ namespace StudyApp.API.Services.Interfaces
     public interface IStudentEnrollServices
     {
         Task AddEnrollmentAsync(StudentEnrollModel model);
+
+        Task<IEnumerable<StudentEnrollModel>> GetEnrollStudents();
     }
 }
