@@ -70,6 +70,15 @@ const navItems: NavItem[] = [
                 name: "Listing", path: "/admin/mocktest/listing", pro: false
             }],
     },
+         {
+        icon: <ClipboardIcon className="w-5 h-5"/>,
+        name: "Enroll Applicant",
+        subItems: [
+            {
+                name: "Pending", path: "/admin/pending/listing", pro: false
+            },
+           ],
+    },
     
 ];
 

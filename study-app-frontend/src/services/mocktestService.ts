@@ -1,4 +1,4 @@
-import {CreateMockTestDto} from "@/types/mocktest";
+import {CreateMockTestDto, MockModel} from "@/types/mocktest";
 import axiosInstance from "@/services/axiosInstance";
 import axios from "axios";
 
@@ -16,7 +16,7 @@ export async function addMockPaper(mock: CreateMockTestDto) {
     }
 }
 
-export const getAllMockPapers = async (): Promise<CreateMockTestDto[]> => {
-    const response = await axiosInstance.get<CreateMockTestDto[]>(`/MockTest/GetMockPaper`);
+export const getAllMockPapers = async (): Promise<MockModel[]> => {
+    const response = await axiosInstance.get<MockModel[]>(`/MockTest/GetMockPaper`);
     return response.data;
 };

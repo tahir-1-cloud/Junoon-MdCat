@@ -2,6 +2,8 @@
 {
     public class CreateMockTestDto
     {
+
+        public int Id { get; set; }
         public string Title { get; set; }
 
         public DateTime TestConductedOn { get; set; }

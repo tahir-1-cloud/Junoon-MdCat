@@ -16,3 +16,8 @@ export async function enrollStudent(enroll:studentEnrollment){
     }
 
 }
+
+export const getAllEnrollStudent = async (): Promise<studentEnrollment[]> => {
+    const response = await axiosInstance.get<studentEnrollment[]>(`/StudentEnrollment/StudentEnroll`);
+    return response.data;
+};

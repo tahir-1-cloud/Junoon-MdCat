@@ -7,7 +7,7 @@
         public string Description { get; set; }
 
         // Navigation
-        public List<MockOptionModel> Options { get; set; } = new();
+        public List<MockOptionModel> MockOptions { get; set; } = new();
 
     }
 }
