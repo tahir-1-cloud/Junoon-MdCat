@@ -3,71 +3,115 @@
 import { useEffect, useState } from 'react';
 import { Table, Input, Select } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { Session } from '@/types/session';
-import {getAllMockPapers} from "@/services/mocktestService";
-import {CreateMockTestDto} from "@/types/mocktest";
+import { studentEnrollment } from '@/types/studentEnrollment';
+import { getAllEnrollStudent } from '@/services/enrollmentService';
 
 export default function Page() {
-    const [papers, setpapers] = useState<CreateMockTestDto[]>([]);
-    const [filteredPapers, setFilteredPapers] = useState<CreateMockTestDto[]>([]);
+    const [students, setStudents] = useState<studentEnrollment[]>([]);
+    const [filteredStudents, setFilteredStudents] = useState<studentEnrollment[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [pageSize, setPageSize] = useState(10);
 
+    // 🔄 Fetch students
     useEffect(() => {
-        const fetchSessions = async () => {
+        const fetchData = async () => {
             try {
-                const data = await getAllMockPapers();
-                setpapers(data);
-                setFilteredPapers(data);
+                const data = await getAllEnrollStudent();
+                setStudents(data);
+                setFilteredStudents(data);
             } catch (error) {
-                console.error('Error fetching sessions:', error);
+                console.error('Error fetching students:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchSessions();
+        fetchData();
     }, []);
 
-    // 🔍 Search filter handler
+    // 🔍 Search filter
     const handleSearch = (value: string) => {
         setSearchTerm(value);
         const lower = value.toLowerCase();
-        const filtered = papers.filter(
+
+        const filtered = students.filter(
             (s) =>
-                s.title.toLowerCase().includes(lower) ||
-                new Date(s.testConductedOn).getFullYear().toString().includes(lower)
+                s.fullName.toLowerCase().includes(lower) ||
+                s.email.toLowerCase().includes(lower) ||
+                s.phoneNumber.toLowerCase().includes(lower) ||
+                s.preferredCourse.toLowerCase().includes(lower) ||
+                (s.city ? s.city.toLowerCase().includes(lower) : false) ||
+                s.status.toLowerCase().includes(lower)
         );
-        setFilteredPapers(filtered);
+
+        setFilteredStudents(filtered);
     };
 
-    const columns: ColumnsType<CreateMockTestDto> = [
+    // 📌 Table Columns
+    const columns: ColumnsType<studentEnrollment> = [
         {
             title: '#',
             dataIndex: 'index',
             key: 'index',
-            render: (_: unknown, __: CreateMockTestDto, index: number) => index + 1,
+            render: (_, __, index) => index + 1,
         },
         {
-            title: 'Title',
-            dataIndex: 'title',
-            key: 'title',
+            title: 'Full Name',
+            dataIndex: 'fullName',
+            key: 'fullName',
         },
         {
-            title: 'Test Date',
-            dataIndex: 'testConductedOn',
-            key: 'testConductedOn',
-            render: (testConductedOn: string) => new Date(testConductedOn).toLocaleDateString(),
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email',
+        },
+        {
+            title: 'Phone Number',
+            dataIndex: 'phoneNumber',
+            key: 'phoneNumber',
+        },
+        {
+            title: 'Course',
+            dataIndex: 'preferredCourse',
+            key: 'preferredCourse',
+        },
+        {
+            title: 'City',
+            dataIndex: 'city',
+            key: 'city',
+            render: (city) => city || '—',
+        },
+        {
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (status) => (
+                <span
+                    className={`px-3 py-1 rounded-full text-white ${
+                        status === 'Pending'
+                            ? 'bg-yellow-500'
+                            : status === 'Approved'
+                            ? 'bg-green-600'
+                            : 'bg-red-600'
+                    }`}
+                >
+                    {status}
+                </span>
+            ),
         },
     ];
 
     return (
         <div className="min-h-screen bg-gray-50 py-10 px-6 flex justify-center">
             <div className="w-full max-w-6xl bg-white rounded-2xl shadow-md p-8">
+
                 {/* Header */}
                 <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
-                    <h1 className="text-3xl font-bold text-gray-800">📘Mock Papers</h1>
+                    <h1 className="text-3xl font-bold text-gray-800">
+                        🎓 Enrolled Students
+                    </h1>
+
                     <div className="flex items-center gap-3">
                         <span className="text-gray-500 text-sm">Show</span>
                         <Select
@@ -94,31 +138,25 @@ export default function Page() {
                 {/* Table */}
                 {loading ? (
                     <div className="flex justify-center py-20 text-gray-600 text-lg font-medium">
-                        Loading MockPaper...
+                        Loading students...
                     </div>
-                ) : filteredPapers.length === 0 ? (
+                ) : filteredStudents.length === 0 ? (
                     <div className="text-center py-20 text-gray-600 text-lg font-medium">
-                        No MockPaper found.
+                        No students found.
                     </div>
                 ) : (
                     <Table
                         columns={columns}
-                        dataSource={filteredPapers}
+                        dataSource={filteredStudents}
                         rowKey="id"
                         pagination={{
                             pageSize,
                             showSizeChanger: false,
-                            showTotal: (total) => `Total ${total} MockPaper`,
+                            showTotal: (total) => `Total ${total} students`,
                         }}
                         bordered
                         className="border border-gray-200 rounded-lg"
-                        style={{
-                            borderRadius: '12px',
-                        }}
                         rowClassName={() => 'hover:bg-gray-50'}
-                        onHeaderRow={() => ({
-                            className: 'bg-blue-50 text-gray-700',
-                        })}
                     />
                 )}
             </div>

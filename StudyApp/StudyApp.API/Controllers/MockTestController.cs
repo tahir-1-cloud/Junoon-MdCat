@@ -66,6 +66,7 @@ namespace StudyApp.API.Controllers
         }
 
         [HttpGet("{mockPaperId}")]
+
         public async Task<IActionResult> GetMockQuestionsForPaper(int mockPaperId)
         {
             try

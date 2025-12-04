@@ -17,7 +17,7 @@ namespace StudyApp.API.Services.Implementations
         //Mock Questions
         public async Task AddMockQuestion(MockQuestionModel request)
         {
-            if (request.Options.Count(o => o.IsCorrect) != 1)
+            if (request.MockOptions.Count(o => o.IsCorrect) != 1)
                 throw new InvalidOperationException("Exactly one option must be marked as correct.");
 
             MockQuestion question = new MockQuestion()
@@ -25,7 +25,7 @@ namespace StudyApp.API.Services.Implementations
                 MockTestId = request.MockTestId,
                 Title = request.Title,
                 Description = request.Description,
-                MockOptions = request.Options.Select(o => new MockOption
+                MockOptions = request.MockOptions.Select(o => new MockOption
                 {
                     OptionText = o.OptionText,
                     IsCorrect = o.IsCorrect
