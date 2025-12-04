@@ -1,0 +1,12 @@
+.vs/
+obj/
+*.user
+*.http
+bin/
+.idea/
+.next/
+node_modules/
+StudyApp/StudyApp.API/appsettings.json
+study-app-frontend/.env.local
+/study-app-frontend/.env.local
+/StudyApp/StudyApp.API/appsettings.json
