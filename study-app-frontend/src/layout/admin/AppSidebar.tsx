@@ -75,7 +75,7 @@ const navItems: NavItem[] = [
         name: "Enroll Applicant",
         subItems: [
             {
-                name: "Pending", path: "/admin/pending/listing", pro: false
+                name: "Pending", path: "/admin/pendingApplicant/listing", pro: false
             },
            ],
     },
