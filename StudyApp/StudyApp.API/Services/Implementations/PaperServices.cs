@@ -39,5 +39,15 @@ namespace StudyApp.API.Services.Implementations
 
             return data;
         }
+
+        public async Task DeletePaper(int paperId)
+        {
+            await _papersRepository.DeletePaperAsync(paperId);
+        }
+
+        public async Task AssignPaperToSession(int paperId, int sessionId)
+        {
+            await _papersRepository.AssignPaperToSessionAsync(paperId, sessionId);
+        }
     }
 }

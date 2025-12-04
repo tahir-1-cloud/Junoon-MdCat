@@ -56,5 +56,41 @@ namespace StudyApp.API.Controllers
                 return BadRequest(ex);
             }
         }
+
+        [HttpDelete("{paperId}")]
+        public async Task<IActionResult> DeletePaper(int paperId)
+        {
+            try
+            {
+                await _paperServices.DeletePaper(paperId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                // log ex if you have logger
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> AssignToSession([FromBody] AssignDto dto)
+        {
+            try
+            {
+                await _paperServices.AssignPaperToSession(dto.PaperId, dto.SessionId);
+                return Ok();
+            }
+            catch (KeyNotFoundException knf)
+            {
+                return NotFound(knf.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

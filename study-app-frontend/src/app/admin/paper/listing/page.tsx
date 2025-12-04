@@ -17,10 +17,13 @@ import {
   message,
 } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { getAllPapers } from '@/services/paperService';
+import { getAllPapers, deletePaper, assignPaperToSession } from '@/services/paperService';
 import { QuestionService } from '@/services/QuestionService';
+import { getAllSessions } from '@/services/sessionService';
 import type { PaperModel } from '@/types/createPaper.model';
 import type { Question } from '@/services/QuestionService';
+import type { Session } from '@/types/session';
+import { ExclamationCircleOutlined, TeamOutlined, AppstoreAddOutlined } from '@ant-design/icons';
 
 export default function Page() {
   const [papers, setPapers] = useState<PaperModel[]>([]);
@@ -36,6 +39,15 @@ export default function Page() {
   const [qLoading, setQLoading] = useState(false);
   const [qError, setQError] = useState<string | null>(null);
 
+  // assign modal state
+  const [assignModalVisible, setAssignModalVisible] = useState(false);
+  const [assignPaper, setAssignPaper] = useState<PaperModel | null>(null);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
+  const [assignLoading, setAssignLoading] = useState(false);
+  const [sessionsError, setSessionsError] = useState<string | null>(null);
+
   // track expanded rows (question ids) so we can toggle expand on Show button
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
 
@@ -47,12 +59,31 @@ export default function Page() {
         setFilteredPapers(data);
       } catch (err) {
         console.error('Failed to load papers', err);
+        message.error('Failed to load papers');
       } finally {
         setLoading(false);
       }
     };
     fetch();
   }, []);
+
+  const refreshPapers = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllPapers();
+      setPapers(data);
+      if (searchTerm && searchTerm.trim() !== '') {
+        handleSearch(searchTerm);
+      } else {
+        setFilteredPapers(data);
+      }
+    } catch (err) {
+      console.error('Failed to refresh papers', err);
+      message.error('Failed to refresh papers');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
@@ -166,6 +197,75 @@ export default function Page() {
     }
   };
 
+  // ---------- NEW: Paper delete (with confirmation) ----------
+  const handleDeletePaper = async (paperId: number | undefined) => {
+    if (paperId === undefined) {
+      message.error('Paper id not available');
+      return;
+    }
+
+    // Note: server is expected to cascade/remove connected entities (questions, attempts, results).
+    try {
+      await deletePaper(paperId);
+      message.success('Paper deleted successfully (and related data).');
+      await refreshPapers();
+    } catch (err: any) {
+      console.error('Failed deleting paper', err);
+      const msg = err?.response?.data ?? err?.message ?? 'Failed to delete paper';
+      message.error(typeof msg === 'string' ? msg : 'Failed to delete paper');
+    }
+  };
+
+  // ---------- NEW: Assign to batch modal ----------
+  const openAssignModal = async (paper: PaperModel) => {
+    setAssignPaper(paper);
+    setAssignModalVisible(true);
+    setSessions([]);
+    setSessionsError(null);
+    setSelectedSessionId(null);
+    setSessionsLoading(true);
+
+    try {
+      const s = await getAllSessions();
+      setSessions(s);
+    } catch (err: any) {
+      console.error('Failed to load sessions', err);
+      setSessionsError('Failed to load sessions');
+    } finally {
+      setSessionsLoading(false);
+    }
+  };
+
+  const closeAssignModal = () => {
+    setAssignModalVisible(false);
+    setAssignPaper(null);
+    setSessions([]);
+    setSessionsError(null);
+    setSelectedSessionId(null);
+    setAssignLoading(false);
+  };
+
+  const handleAssign = async () => {
+    if (!assignPaper || selectedSessionId == null) {
+      message.warning('Please select a session to assign.');
+      return;
+    }
+
+    setAssignLoading(true);
+    try {
+      await assignPaperToSession(Number(assignPaper.id), Number(selectedSessionId));
+      message.success('Paper assigned to session successfully.');
+      closeAssignModal();
+      await refreshPapers();
+    } catch (err: any) {
+      console.error('Failed to assign paper', err);
+      const msg = err?.response?.data ?? err?.message ?? 'Failed to assign';
+      message.error(typeof msg === 'string' ? msg : 'Failed to assign paper');
+    } finally {
+      setAssignLoading(false);
+    }
+  };
+
   const columns: ColumnsType<PaperModel> = [
     {
       title: '#',
@@ -194,6 +294,7 @@ export default function Page() {
               type="default"
               size="small"
               shape="round"
+              icon={<AppstoreAddOutlined />}
               style={{
                 background: 'white',
                 border: '1px solid #e6f0ff',
@@ -219,6 +320,33 @@ export default function Page() {
           >
             Show Questions
           </Button>
+
+          <Button
+            size="small"
+            onClick={() => openAssignModal(paper)}
+            icon={<TeamOutlined />}
+            style={{
+              padding: '4px 12px',
+              borderRadius: 20,
+            }}
+            type="default"
+          >
+            Assign
+          </Button>
+
+          <Popconfirm
+            title="Delete paper?"
+            description="This will permanently delete the paper and all related data (questions, attempts, results). Are you sure?"
+            onConfirm={() => handleDeletePaper(Number(paper.id))}
+            okText="Delete"
+            cancelText="Cancel"
+            icon={<ExclamationCircleOutlined />}
+            getPopupContainer={() => document.body}
+          >
+            <Button danger type="primary" size="small" style={{ padding: '4px 10px', borderRadius: 20 }}>
+              Delete
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },
@@ -355,7 +483,7 @@ export default function Page() {
           <Table
             columns={columns}
             dataSource={filteredPapers}
-            rowKey="id"
+            rowKey={(r) => String((r as any).id)}
             pagination={{
               pageSize,
               showSizeChanger: false,
@@ -407,6 +535,118 @@ export default function Page() {
                 expandRowByClick: false,
               }}
             />
+          )}
+        </Modal>
+
+        {/* Assign to Batch Modal */}
+        <Modal
+          title={assignPaper ? `Assign — ${assignPaper.title}` : 'Assign to batch'}
+          open={assignModalVisible}
+          onCancel={closeAssignModal}
+          footer={[
+            <Button key="cancel" onClick={closeAssignModal} size="small">
+              Cancel
+            </Button>,
+            <Button key="assign" type="primary" loading={assignLoading} onClick={handleAssign} size="small">
+              Assign
+            </Button>,
+          ]}
+          width={800}
+          centered
+        >
+          {sessionsLoading ? (
+            <div className="w-full flex justify-center py-8">
+              <Spin />
+            </div>
+          ) : sessionsError ? (
+            <Alert message="Error" description={sessionsError} type="error" showIcon />
+          ) : sessions.length === 0 ? (
+            <div className="text-center py-10 text-gray-500">
+              No sessions available. Create sessions first.
+            </div>
+          ) : (
+            <div>
+              <div className="mb-4 text-sm text-gray-600">Select a session to assign this paper to:</div>
+              <Table
+                dataSource={sessions}
+                rowKey="id"
+                pagination={false}
+                size="small"
+                columns={[
+                  {
+                    title: '#',
+                    key: 'idx',
+                    render: (_: any, __: Session, idx: number) => idx + 1,
+                    width: 60,
+                  },
+                  {
+                    title: 'Title',
+                    dataIndex: 'title',
+                    key: 'title',
+                  },
+                  {
+                    title: 'Description',
+                    dataIndex: 'description',
+                    key: 'description',
+                    render: (d: string) => <div className="text-sm text-gray-600">{d}</div>,
+                  },
+                  {
+                    title: 'Session Year',
+                    dataIndex: 'sessionYear',
+                    key: 'sessionYear',
+                    render: (y: string) => new Date(y).getFullYear(),
+                    width: 120,
+                  },
+                  {
+                    title: 'Action',
+                    key: 'action',
+                    width: 140,
+                    render: (_: any, r: Session) => {
+                      const isSelected = selectedSessionId === Number(r.id);
+                      return (
+                        <Space size="small">
+                          <Button
+                            size="small"
+                            onClick={() => setSelectedSessionId(Number(r.id))}
+                            style={{
+                              background: isSelected ? '#eef6ff' : 'white',
+                              border: '1px solid #e6e9ef',
+                            }}
+                          >
+                            {isSelected ? 'Selected' : 'Select'}
+                          </Button>
+                          <Button
+                            size="small"
+                            onClick={async () => {
+                              setSelectedSessionId(Number(r.id));
+                              setAssignLoading(true);
+                              try {
+                                if (!assignPaper) {
+                                  message.error('Paper not available');
+                                  return;
+                                }
+                                await assignPaperToSession(Number(assignPaper.id), Number(r.id));
+                                message.success('Paper assigned to session successfully.');
+                                closeAssignModal();
+                                await refreshPapers();
+                              } catch (err: any) {
+                                console.error('Failed to assign paper', err);
+                                const msg = err?.response?.data ?? err?.message ?? 'Failed to assign';
+                                message.error(typeof msg === 'string' ? msg : 'Failed to assign paper');
+                              } finally {
+                                setAssignLoading(false);
+                              }
+                            }}
+                          >
+                            Assign now
+                          </Button>
+                        </Space>
+                      );
+                    },
+                  },
+                ]}
+              />
+            </div>
           )}
         </Modal>
       </div>

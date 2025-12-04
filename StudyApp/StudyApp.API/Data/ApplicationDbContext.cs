@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StudyApp.API.Domain.Entities;
+using StudyApp.API.Models;
 
 namespace StudyApp.API.Data
 {
@@ -22,11 +23,14 @@ namespace StudyApp.API.Data
         public DbSet<MockOption> MockOptions { get; set; }
 
         public DbSet<StudentEnrollment> StudentEnrollments { get; set; }
+
+        public DbSet<PaperSession> PaperSessions { get; set; }
+        public DbSet<StudentAttempt> StudentAttempts { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Added Query Filter
+            // existing query filters
             modelBuilder.Entity<ApplicationUser>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<Session>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<Paper>().HasQueryFilter(x => !x.IsDeleted);
@@ -34,6 +38,57 @@ namespace StudyApp.API.Data
             modelBuilder.Entity<Option>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<UserLogin>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<StudentEnrollment>().HasQueryFilter(x => !x.IsDeleted);
+
+            // --- ensure Paper -> Question -> Option cascade ---
+            modelBuilder.Entity<Question>()
+                .HasOne(q => q.Paper)
+                .WithMany(p => p.Questions)
+                .HasForeignKey(q => q.PaperId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Option>()
+                .HasOne(o => o.Question)
+                .WithMany(q => q.Options)
+                .HasForeignKey(o => o.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // --- PaperSession (link table) ---
+            modelBuilder.Entity<PaperSession>()
+                .HasKey(ps => new { ps.PaperId, ps.SessionId });
+
+            modelBuilder.Entity<PaperSession>()
+                .HasOne(ps => ps.Paper)
+                .WithMany(p => p.PaperSessions)
+                .HasForeignKey(ps => ps.PaperId)
+                // make relationship optional to avoid query-filter warning, or keep required and add filter for PaperSession below
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PaperSession>()
+                .HasOne(ps => ps.Session)
+                .WithMany(s => s.PaperSessions)
+                .HasForeignKey(ps => ps.SessionId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // add a query filter for dependents too (to avoid EF complaint about principal filter)
+            modelBuilder.Entity<PaperSession>().HasQueryFilter(ps => !ps.IsDeleted);
+
+            // --- StudentAttempt configuration ---
+            modelBuilder.Entity<StudentAttempt>()
+                .HasOne(a => a.Paper)
+                .WithMany(p => p.Attempts)
+                .HasForeignKey(a => a.PaperId)
+                .IsRequired(false) // optional to avoid filter interaction; make required if you prefer but then add matching filters
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // add query filter for StudentAttempt as well
+            modelBuilder.Entity<StudentAttempt>().HasQueryFilter(a => !a.IsDeleted);
+
+            // set precision for Score to avoid truncation (adjust precision/scale as needed)
+            modelBuilder.Entity<StudentAttempt>()
+                .Property(a => a.Score)
+                .HasPrecision(10, 2);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

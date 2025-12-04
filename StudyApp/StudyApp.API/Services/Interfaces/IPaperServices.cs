@@ -7,5 +7,8 @@ namespace StudyApp.API.Services.Interfaces
         Task AddPaper(CreatePaperModel request);
         Task<PaperModel> GetPaperWithQuestions(int paperId);
         Task<IEnumerable<PaperModel>> GetPapers();
+
+        Task DeletePaper(int paperId);
+        Task AssignPaperToSession(int paperId, int sessionId);
     }
 }
