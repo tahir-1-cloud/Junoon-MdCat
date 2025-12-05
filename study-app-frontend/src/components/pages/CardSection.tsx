@@ -71,7 +71,7 @@ const CardSection = () => {
 
   return (
     <section className="relative min-h-screen bg-gradient-to-b from-[#e6f2ff] via-[#f5faff] to-[#fefefe] py-24 overflow-hidden">
-      {/* Gentle background accents */}
+      {/* Background accent */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(180,210,255,0.25),transparent_60%),radial-gradient(circle_at_80%_90%,rgba(255,245,200,0.25),transparent_60%)] pointer-events-none"></div>
 
       {/* Header */}
@@ -79,25 +79,22 @@ const CardSection = () => {
         <h1 className="text-4xl md:text-5xl font-extrabold text-[#22418c] mb-4 drop-shadow-md">
           🌟 Comprehensive Learning Courses
         </h1>
-
         <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
-          Explore engaging lectures, interactive exercises, and insightful explanations crafted by experts to make learning fun and effective.
+          Engage with lectures, interactive exercises, and expert insights designed for MDCAT aspirants.
         </p>
-
         <div className="mt-8 h-1 w-24 bg-gradient-to-r from-yellow-400 to-blue-600 mx-auto rounded-full"></div>
       </div>
 
-      {/* Course Grid */}
+      {/* Courses Grid */}
       <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-7xl mx-auto px-6">
         {courses.map((course) => {
           const embedUrl = `${toEmbedUrl(course.video)}?autoplay=1&modestbranding=1&rel=0`;
-
           return (
             <div
               key={course.title}
               className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl border border-blue-100 hover:border-blue-400 transform hover:-translate-y-2 transition-all duration-300 overflow-hidden group"
             >
-              {/* Image or Video */}
+              {/* Image / Video */}
               <div className="relative w-full h-64 bg-blue-100 overflow-hidden">
                 {activeVideo === course.title ? (
                   <iframe
@@ -132,10 +129,7 @@ const CardSection = () => {
                 <h3 className="text-2xl font-semibold text-[#22418c] mb-2">
                   {course.title}
                 </h3>
-                <p className="text-gray-600 mb-5 leading-relaxed">
-                  {course.desc}
-                </p>
-
+                <p className="text-gray-600 mb-5 leading-relaxed">{course.desc}</p>
                 {activeVideo === course.title ? (
                   <button
                     onClick={() => setActiveVideo(null)}

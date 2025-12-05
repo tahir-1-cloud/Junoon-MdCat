@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-
+import Image from "next/image"; 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
 
@@ -14,7 +14,7 @@ export default function Contact() {
     e.preventDefault();
     console.log("Form submitted:", formData);
     setFormData({ name: "", email: "", message: "" });
-    alert("Thank you for contacting us! We'll get back to you soon.");
+    alert("Thank you for contacting us! We’ll reach out shortly.");
   };
 
   return (
@@ -30,21 +30,31 @@ export default function Contact() {
         className="text-center mb-16 z-10"
       >
         <h1 className="text-4xl md:text-5xl font-extrabold text-[#22418c] mb-4 drop-shadow-md">
-          Contact Us
+          Get in Touch
         </h1>
         <p className="text-gray-700 max-w-2xl mx-auto text-lg leading-relaxed">
-          Have a question, feedback, or just want to say hello?  
-          We’d love to hear from you! Our team at{" "}
-          <span className="text-[#ffdf20] font-semibold">EduPrep</span> is always here to help.
+          Have a question about MDCAT preparation, registration, or our online test system?  
+          <span className="block mt-1">
+            The team at <span className="text-[#1447e6] font-semibold">JUNOON MDCAT</span> is always happy to help.
+          </span>
         </p>
       </motion.div>
 
       {/* Contact Info Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full mb-16 z-10">
         {[
-          { icon: "📧", title: "Email Us", info: "support@eduprep.com" },
-          { icon: "📞", title: "Call Us", info: "+92 314 4099819" },
-          { icon: "📍", title: "Visit Us", info: "Lahore, Pakistan" },
+          { icon: "📧", title: "Email Us", info: "junoonmdcat222@gmail.com" },
+          { icon: "📞", title: "Call Us", info: "+92 0333-4030107" },
+          { 
+            icon: "📍", 
+            title: "Visit Us", 
+            info: (
+              <>
+                JUNOON MDCAT Learning Center <br />
+                Johar Town, Lahore, Pakistan
+              </>
+            )
+          },
         ].map((item, index) => (
           <motion.div
             key={index}
@@ -53,14 +63,15 @@ export default function Contact() {
           >
             <div className="text-5xl mb-3">{item.icon}</div>
             <h3 className="text-xl font-semibold text-[#22418c] mb-2">{item.title}</h3>
-            <p className="text-gray-600">{item.info}</p>
+            <p className="text-gray-600 leading-relaxed">{item.info}</p>
           </motion.div>
         ))}
       </div>
 
-      {/* Contact Form with Image Grid */}
+      {/* Main Section */}
       <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-10 items-center z-10">
-        {/* Left Side Image Card */}
+        
+        {/* Left Card */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -68,23 +79,23 @@ export default function Contact() {
           className="bg-white rounded-3xl shadow-lg overflow-hidden border border-[#eff6ff]"
         >
           <img
-            src="https://images.unsplash.com/photo-1606761568499-6d2451b23c36?auto=format&fit=crop&w=900&q=80"
+            src="/images/Landingpage/contactus.avif"
             alt="Contact Support"
             className="w-full h-[480px] object-cover"
           />
           <div className="p-6 text-center">
             <h3 className="text-2xl font-semibold text-[#22418c] mb-2">
-              Let’s Get in Touch
+              We're Here to Support You
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Whether you’re a student or educator, we’re here to assist you with 
-              any inquiries about <span className="text-[#ffdf20] font-semibold">EduPrep</span>.
-              Send us a message and our team will respond shortly.
+              Whether you're preparing for MDCAT or need help using the{" "}
+              <span className="text-[#1447e6] font-semibold">JUNOON MDCAT Online Test Portal</span>, 
+              our support team is available to guide you every step of the way.
             </p>
           </div>
         </motion.div>
 
-        {/* Right Side Contact Form */}
+        {/* Contact Form */}
         <motion.form
           onSubmit={handleSubmit}
           initial={{ opacity: 0, x: 40 }}
@@ -98,13 +109,13 @@ export default function Contact() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-gray-700 font-medium mb-2">Your Name</label>
+              <label className="block text-gray-700 font-medium mb-2">Full Name</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Enter your name"
+                placeholder="Enter your full name"
                 required
                 className="w-full p-3 rounded-lg border border-[#eff6ff] focus:ring-2 focus:ring-[#1447e6] outline-none transition-all"
               />
@@ -117,7 +128,7 @@ export default function Contact() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Enter your email"
+                placeholder="yourname@example.com"
                 required
                 className="w-full p-3 rounded-lg border border-[#eff6ff] focus:ring-2 focus:ring-[#1447e6] outline-none transition-all"
               />
@@ -130,7 +141,7 @@ export default function Contact() {
               name="message"
               value={formData.message}
               onChange={handleChange}
-              placeholder="Write your message here..."
+              placeholder="Write your message..."
               required
               rows={5}
               className="w-full p-3 rounded-lg border border-[#eff6ff] focus:ring-2 focus:ring-[#1447e6] outline-none transition-all resize-none"

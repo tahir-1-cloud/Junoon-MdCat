@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
-
+import Image from "next/image";
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -10,10 +10,16 @@ const Navbar = () => {
     <nav className="bg-blue-700 text-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
         {/* Brand / Logo */}
-        <Link href="/" className="text-2xl font-bold tracking-wide hover:text-yellow-300 transition">
-          AcademyPro
-        </Link>
-
+        <Link href="/" className="inline-block hover:opacity-80 transition">
+    <Image
+            src="/images/logo/auth-logo.svg"
+            alt="AcademyPro Logo"
+            width={280}   // smaller width for navbar
+            height={40}   // smaller height for navbar
+            className="object-contain"
+            priority
+          />
+    </Link>
         {/* Mobile Menu Button */}
         <button
           className="md:hidden text-white text-2xl"

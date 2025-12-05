@@ -35,8 +35,8 @@ const Footer = () => {
         {/* Contact & Socials */}
         <div>
           <h4 className="text-xl font-semibold text-yellow-300 mb-3">Contact Us</h4>
-          <p>Email: <span className="text-yellow-300">support@entrytestpro.com</span></p>
-          <p>Phone: +92 3144099819</p>
+          <p>Email: <span className="text-yellow-300">junoonmdcat222@gmail.com </span></p>
+          <p>Phone: +92 0333-4030107</p>
 
           <div className="flex justify-center md:justify-start space-x-4 mt-4">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-300 text-2xl">
@@ -57,7 +57,7 @@ const Footer = () => {
 
       {/* Bottom Bar */}
       <div className="bg-blue-800 mt-10 py-4 text-center text-sm border-t border-blue-600">
-        <p>© {new Date().getFullYear()} <span className="text-yellow-300 font-semibold">EntryTestPro</span>. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} <span className="text-yellow-300 font-semibold">JUNOON MDCAT</span>. All rights reserved.</p>
         <p className="mt-1">Made with ❤️ by <span className="font-semibold">M. Tahir</span></p>
       </div>
     </footer>
