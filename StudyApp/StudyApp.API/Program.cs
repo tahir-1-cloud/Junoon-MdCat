@@ -14,9 +14,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-//image upload support
 
-builder.Services.AddSingleton<IWebHostEnvironment>(builder.Environment);
 
 
 // Add Base Repository
