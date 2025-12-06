@@ -1,18 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace StudyApp.API.Domain.Entities
+namespace StudyApp.API.Dto
 {
-    public class Lecture:AuditEntity
+    public class LectureDto
     {
         public string Title { get; set; }
-
-        [MaxLength(2000)]
         public string Description { get; set; }
-
         public string YoutubeUrl { get; set; }
-
-        public string? ImageUrl { get; set; }
-
-      
+        public string ImageUrl { get; set; }
     }
+    
 }

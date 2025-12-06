@@ -14,6 +14,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+//image upload support
+
+builder.Services.AddSingleton<IWebHostEnvironment>(builder.Environment);
+
+
 // Add Base Repository
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IPapersRepository, PapersRepository>();
@@ -28,6 +33,7 @@ builder.Services.AddScoped<IMockOptionRepository, MockOptionRepository>();
 builder.Services.AddScoped<IStudentEnrollRepository, StudentEnrollRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<ISubscriberRepository, SubscriberRepository>();
+builder.Services.AddScoped<ILecturesRepository, LecturesRepository>();
 
 
 
@@ -43,6 +49,7 @@ builder.Services.AddScoped<IMockOptionServices, MockOptionServices>();
 builder.Services.AddScoped<IStudentEnrollServices, StudentEnrollServices>();
 builder.Services.AddScoped<IContactServices, ContactServices>();
 builder.Services.AddScoped<ISubscriberServices, SubscriberServices>();
+builder.Services.AddScoped<ILectureServices, LectureServices>();
 
 
 
@@ -78,6 +85,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseCors("StudyApp");
