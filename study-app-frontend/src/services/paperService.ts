@@ -2,6 +2,7 @@ import {CreatePaperModel, PaperModel} from "@/types/createPaper.model";
 import axiosInstance from "@/services/axiosInstance";
 import axios from "axios";
 
+
 export async function addPaper(paper: CreatePaperModel) {
     try {
         const response = await axiosInstance.post('/Paper/AddPaper', paper);

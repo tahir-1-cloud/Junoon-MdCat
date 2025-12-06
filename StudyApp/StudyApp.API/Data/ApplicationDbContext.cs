@@ -29,6 +29,8 @@ namespace StudyApp.API.Data
 
         public DbSet<ContactMessage> ContactMessages { get; set; }
         public DbSet<Subscriber> Subscribers { get; set; }
+        
+        public DbSet<Lecture> Lectures { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -41,6 +43,12 @@ namespace StudyApp.API.Data
             modelBuilder.Entity<Option>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<UserLogin>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<StudentEnrollment>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<Lecture>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<Subscriber>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<ContactMessage>().HasQueryFilter(x => !x.IsDeleted);
+
+
+
 
             // --- ensure Paper -> Question -> Option cascade ---
             modelBuilder.Entity<Question>()

@@ -1,53 +1,107 @@
 "use client";
 
 import Image from "next/image";
-
-const blogs = [
-  {
-    title: "Mastering Entry Tests: Tips & Strategies",
-    desc: "Learn how to manage time, handle tricky questions, and stay calm under pressure during your entry test preparation.",
-    img: "/images/Landingpage/blog1.png",
-    date: "October 5, 2025",
-    author: "Team StudyPro",
-  },
-  {
-    title: "Top 10 Study Hacks for Smarter Learning",
-    desc: "Discover scientifically proven methods to memorize faster, understand better, and stay focused longer.",
-    img: "/images/Landingpage/blog3.jpg",
-    date: "September 30, 2025",
-    author: "Education Insights",
-  },
-  {
-    title: "The Importance of Practice Tests",
-    desc: "Regular practice tests improve your accuracy, confidence, and help identify weak areas before the real exam.",
-    img: "/images/Landingpage/blog4.png",
-    date: "September 25, 2025",
-    author: "Study Experts",
-  },
-  {
-    title: "Boost Your Memory Power Naturally",
-    desc: "From nutrition to sleep patterns — explore how lifestyle choices can improve your brain’s retention ability.",
-    img: "/images/Landingpage/blog2.jpg",
-    date: "September 20, 2025",
-    author: "MindFuel Academy",
-  },
-  {
-    title: "Why Mock Exams Matter",
-    desc: "Mock exams simulate the real test environment and teach you how to deal with stress and pacing effectively.",
-    img: "/images/Landingpage/blog7.jpg",
-    date: "September 15, 2025",
-    author: "EduMentor Team",
-  },
-  {
-    title: "Building Confidence Before Your Exam",
-    desc: "Confidence can make or break your performance — learn powerful ways to stay calm and confident on test day.",
-    img: "/images/Landingpage/blog5.jpg",
-    date: "September 10, 2025",
-    author: "Motivation Hub",
-  },
-];
+import { useState } from "react";
+import Swal from "sweetalert2";
+import { addsubscriber } from "@/services/publicServices"; // make sure path is correct
 
 export default function BlogPage() {
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = async () => {
+    // Email Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email) {
+      Swal.fire({
+        title: "Email Required",
+        text: "Please enter your email address.",
+        icon: "warning",
+        confirmButtonColor: "#1447e6",
+      });
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      Swal.fire({
+        title: "Invalid Email",
+        text: "Please enter a valid email address.",
+        icon: "error",
+        confirmButtonColor: "#1447e6",
+      });
+      return;
+    }
+
+    try {
+      await addsubscriber({ email: email });
+
+      setEmail("");
+
+      Swal.fire({
+        title: "Subscribed!",
+        text: "Thank you for subscribing. You will now receive the latest updates.",
+        icon: "success",
+        confirmButtonColor: "#1447e6",
+        background: "#ffffff",
+        customClass: {
+          popup: "rounded-2xl shadow-xl p-4",
+        },
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: "Something went wrong! Please try again later.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+      });
+    }
+  };
+
+  const blogs = [
+    {
+      title: "Mastering Entry Tests: Tips & Strategies",
+      desc: "Learn how to manage time, handle tricky questions, and stay calm under pressure during your entry test preparation.",
+      img: "/images/Landingpage/blog1.png",
+      date: "October 5, 2025",
+      author: "Team StudyPro",
+    },
+    {
+      title: "Top 10 Study Hacks for Smarter Learning",
+      desc: "Discover scientifically proven methods to memorize faster, understand better, and stay focused longer.",
+      img: "/images/Landingpage/blog3.jpg",
+      date: "September 30, 2025",
+      author: "Education Insights",
+    },
+    {
+      title: "The Importance of Practice Tests",
+      desc: "Regular practice tests improve your accuracy, confidence, and help identify weak areas before the real exam.",
+      img: "/images/Landingpage/blog4.png",
+      date: "September 25, 2025",
+      author: "Study Experts",
+    },
+    {
+      title: "Boost Your Memory Power Naturally",
+      desc: "From nutrition to sleep patterns — explore how lifestyle choices can improve your brain’s retention ability.",
+      img: "/images/Landingpage/blog2.jpg",
+      date: "September 20, 2025",
+      author: "MindFuel Academy",
+    },
+    {
+      title: "Why Mock Exams Matter",
+      desc: "Mock exams simulate the real test environment and teach you how to deal with stress and pacing effectively.",
+      img: "/images/Landingpage/blog7.jpg",
+      date: "September 15, 2025",
+      author: "EduMentor Team",
+    },
+    {
+      title: "Building Confidence Before Your Exam",
+      desc: "Confidence can make or break your performance — learn powerful ways to stay calm and confident on test day.",
+      img: "/images/Landingpage/blog5.jpg",
+      date: "September 10, 2025",
+      author: "Motivation Hub",
+    },
+  ];
+
   return (
     <section className="bg-[#eff6ff] min-h-screen py-20 px-6">
       {/* Header */}
@@ -104,13 +158,20 @@ export default function BlogPage() {
         <p className="text-gray-700 mb-8">
           Subscribe to our newsletter to get the latest updates on study tips, new courses, and motivational blogs delivered straight to your inbox.
         </p>
+
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <input
             type="email"
             placeholder="Enter your email"
             className="w-72 px-5 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1447e6]"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
-          <button className="bg-[#1447e6] hover:bg-[#22418c] text-[#ffdf20] px-8 py-3 rounded-full font-semibold shadow-md hover:shadow-xl transition-all duration-300">
+
+          <button
+            onClick={handleSubscribe}
+            className="bg-[#1447e6] hover:bg-[#22418c] text-[#ffdf20] px-8 py-3 rounded-full font-semibold shadow-md hover:shadow-xl transition-all duration-300"
+          >
             Subscribe
           </button>
         </div>

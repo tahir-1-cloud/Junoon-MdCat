@@ -2,27 +2,59 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import Image from "next/image"; 
+import { addcontactinfo } from "@/services/publicServices"; // import your service
+import Swal from "sweetalert2";
+
+
 export default function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    await addcontactinfo({
+      fullName: formData.name,
+      email: formData.email,
+      message: formData.message,
+    });
+
     setFormData({ name: "", email: "", message: "" });
-    alert("Thank you for contacting us! We’ll reach out shortly.");
-  };
+
+    Swal.fire({
+      title: "Message Sent!",
+      text: "Thank you for contacting us. We’ll reach out shortly.",
+      icon: "success",
+      confirmButtonText: "OK",
+      confirmButtonColor: "#1447e6",
+      background: "#ffffff",
+      allowOutsideClick: false,
+      customClass: {
+        popup: "rounded-2xl shadow-xl p-4"
+      }
+    });
+
+  } catch (error) {
+    Swal.fire({
+      title: "Error",
+      text: "Something went wrong. Please try again later.",
+      icon: "error",
+      confirmButtonText: "OK",
+      confirmButtonColor: "#d33",
+    });
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-[#eff6ff] flex flex-col items-center justify-center px-6 py-20 relative overflow-hidden">
-      {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_1px_1px,#1447e6_1px,transparent_0)] bg-[length:40px_40px]" />
 
-      {/* Header Section */}
       <motion.div
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -40,7 +72,6 @@ export default function Contact() {
         </p>
       </motion.div>
 
-      {/* Contact Info Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full mb-16 z-10">
         {[
           { icon: "📧", title: "Email Us", info: "junoonmdcat222@gmail.com" },
@@ -68,10 +99,7 @@ export default function Contact() {
         ))}
       </div>
 
-      {/* Main Section */}
       <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-10 items-center z-10">
-        
-        {/* Left Card */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -95,7 +123,6 @@ export default function Contact() {
           </div>
         </motion.div>
 
-        {/* Contact Form */}
         <motion.form
           onSubmit={handleSubmit}
           initial={{ opacity: 0, x: 40 }}
@@ -151,14 +178,14 @@ export default function Contact() {
           <div className="text-center">
             <button
               type="submit"
-              className="px-10 py-3 bg-[#1447e6] hover:bg-[#22418c] text-[#ffdf20] font-bold rounded-full shadow-md hover:shadow-xl transition-all duration-300"
+              disabled={loading}
+              className={`px-10 py-3 ${loading ? "bg-gray-400" : "bg-[#1447e6] hover:bg-[#22418c]"} text-[#ffdf20] font-bold rounded-full shadow-md hover:shadow-xl transition-all duration-300`}
             >
-              Send Message
+              {loading ? "Sending..." : "Send Message"}
             </button>
           </div>
         </motion.form>
       </div>
-
     </div>
   );
 }
