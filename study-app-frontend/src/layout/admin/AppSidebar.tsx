@@ -15,19 +15,10 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-    {
-        icon: <Squares2X2Icon className="w-5 h-5"  />,
-        name: "Dashboard",
-        subItems: [{ name: "Ecommerce", path: "/", pro: false }],
-    },
-    {
-        icon: <CalendarDaysIcon className="w-5 h-5"  />,
-        name: "Calendar",
-        path: "/calendar",
-    },
+ 
     {
         icon: <UserIcon className="w-5 h-5" />,
-        name: "Admin Profile",
+        name: "Admin Dashboard",
         path: "/profile",
     },
     {
@@ -83,14 +74,14 @@ const navItems: NavItem[] = [
 ];
 
 const othersItems: NavItem[] = [
-    {
-        icon: <FiPieChart />,
-        name: "Charts",
-        subItems: [
-            { name: "Line Chart", path: "/line-chart", pro: false },
-            { name: "Bar Chart", path: "/bar-chart", pro: false },
-        ],
-    },
+    // {
+    //     icon: <FiPieChart />,
+    //     name: "Charts",
+    //     subItems: [
+    //         { name: "Line Chart", path: "/line-chart", pro: false },
+    //         { name: "Bar Chart", path: "/bar-chart", pro: false },
+    //     ],
+    // },
 ];
 
 const AppSidebar: React.FC = () => {

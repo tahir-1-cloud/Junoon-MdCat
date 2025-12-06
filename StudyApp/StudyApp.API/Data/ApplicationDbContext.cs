@@ -26,6 +26,9 @@ namespace StudyApp.API.Data
 
         public DbSet<PaperSession> PaperSessions { get; set; }
         public DbSet<StudentAttempt> StudentAttempts { get; set; }
+
+        public DbSet<ContactMessage> ContactMessages { get; set; }
+        public DbSet<Subscriber> Subscribers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

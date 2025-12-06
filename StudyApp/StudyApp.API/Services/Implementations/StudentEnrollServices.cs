@@ -22,7 +22,7 @@ namespace StudyApp.API.Services.Implementations
         }
         public async Task AddEnrollmentAsync(StudentEnrollModel model)
         {
-            StudentEnrollment enrollment = new StudentEnrollment()
+            var enrollment = new StudentEnrollment()
             {
                 FullName = model.FullName,
                 Email = model.Email,

@@ -26,6 +26,10 @@ builder.Services.AddScoped<IMockRepository, MockRepository>();
 builder.Services.AddScoped<IMockQuestionRepository, MockQuestionRepository>();
 builder.Services.AddScoped<IMockOptionRepository, MockOptionRepository>();
 builder.Services.AddScoped<IStudentEnrollRepository, StudentEnrollRepository>();
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
+builder.Services.AddScoped<ISubscriberRepository, SubscriberRepository>();
+
+
 
 // Register Services
 builder.Services.AddScoped<IAuthenticationServices, AuthenticationServices>();
@@ -37,6 +41,10 @@ builder.Services.AddScoped<IMockServices, MockServices>();
 builder.Services.AddScoped<IMockQuestionServices, MockQuestionServices>();
 builder.Services.AddScoped<IMockOptionServices, MockOptionServices>();
 builder.Services.AddScoped<IStudentEnrollServices, StudentEnrollServices>();
+builder.Services.AddScoped<IContactServices, ContactServices>();
+builder.Services.AddScoped<ISubscriberServices, SubscriberServices>();
+
+
 
 
 // Mapster config
