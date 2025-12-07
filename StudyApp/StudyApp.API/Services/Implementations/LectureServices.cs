@@ -1,4 +1,5 @@
-﻿using StudyApp.API.Domain.Entities;
+﻿using Mapster;
+using StudyApp.API.Domain.Entities;
 using StudyApp.API.Domain.Interfaces;
 using StudyApp.API.Dto;
 using StudyApp.API.Models;
@@ -28,5 +29,10 @@ namespace StudyApp.API.Services.Implementations
             await _lecturesRepository.AddAsync(lecture);
         }
 
+        public async Task<IEnumerable<LectureDto>> GetLectures()
+        {
+            IEnumerable<Lecture> enumerable = await _lecturesRepository.GetAsync();
+            return enumerable.Adapt<IEnumerable<LectureDto>>();
+        }
     }
 }

@@ -61,20 +61,28 @@ const navItems: NavItem[] = [
                 name: "Listing", path: "/admin/mocktest/listing", pro: false
             }],
     },
-         {
+
+      {
             icon: <ClipboardIcon className="w-5 h-5"/>,
-            name: "Enroll Applicant",
+            name: "Public Lectures",
             subItems: [
                 {
-                    name: "Pending", path: "/admin/pendingApplicant/listing", pro: false
+                    name: "Add Lectures", path: "/admin/lectures/add", pro: false
+                },
+                   {
+                    name: "Lectures info", path: "/admin/lectures/list", pro: false
                 },
      ],
     },
+   
     
       {
             icon: <ClipboardIcon className="w-5 h-5"/>,
             name: "User Engagement",
             subItems: [
+                 {
+                    name: "Pending Students", path: "/admin/userEngagement/pendingapplicant", pro: false
+                },
                 {
                     name: "Contact Requests", path: "/admin/userEngagement/contactlist", pro: false
                 },

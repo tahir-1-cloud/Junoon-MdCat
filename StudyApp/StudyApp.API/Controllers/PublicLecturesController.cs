@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StudyApp.API.Dto;
 using StudyApp.API.Models;
+using StudyApp.API.Services.Implementations;
 using StudyApp.API.Services.Interfaces;
 
 namespace StudyApp.API.Controllers
@@ -27,7 +28,7 @@ namespace StudyApp.API.Controllers
                     return BadRequest("Image is missing!");
 
                 string webRoot = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                string uploadFolder = Path.Combine(webRoot, "upload");
+                string uploadFolder = Path.Combine(webRoot, "uploads");
                 if (!Directory.Exists(uploadFolder))
                     Directory.CreateDirectory(uploadFolder);
 
@@ -55,9 +56,22 @@ namespace StudyApp.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex);
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAlllectures()
+        {
+            try
+            {
+                IEnumerable<LectureDto> lectur = await _lectureServices.GetLectures();
+                return Ok(lectur);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }
