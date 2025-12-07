@@ -35,20 +35,23 @@ const Navbar = () => {
             menuOpen ? "block" : "hidden"
           }`}
         >
-          {["Home", "About", "Contact", "Blog"].map((item) => (
+          {["Home", "Courses", "About", "Contact", "Blog"].map((item) => (
           <li key={item} className="border-b md:border-none border-blue-600">
             <Link
-              href={
-                item.toLowerCase() === "home"
-                  ? "/"
-                  : item.toLowerCase() === "about"
-                  ? "/about"
-                  : item.toLowerCase() === "contact"
-                  ? "/contact"
-                  : item.toLowerCase() === "blog"
-                  ? "/blog"
-                  : `/${item.toLowerCase()}`
-              }
+                  href={
+              item.toLowerCase() === "home"
+                ? "/"
+                : item.toLowerCase() === "courses"
+                ? "/courses"
+                : item.toLowerCase() === "about"
+                ? "/about"
+                : item.toLowerCase() === "contact"
+                ? "/contact"
+                : item.toLowerCase() === "blog"
+                ? "/blog"
+                : `/${item.toLowerCase()}`
+            }
+
               className="block px-6 py-3 md:p-0 hover:text-yellow-300 font-medium"
             >
               {item}

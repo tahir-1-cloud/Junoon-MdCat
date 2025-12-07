@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { LecturesModel } from "@/types/lecturesModel";
 import { getLectures } from "@/services/lecturesServices";
+import Link from "next/link";
 
 export default function HomeLectures() {
   const [lectures, setLectures] = useState<LecturesModel[]>([]);
@@ -111,6 +112,15 @@ export default function HomeLectures() {
             </div>
           );
         })}
+      </div>
+
+      <div className="text-center mt-16">
+        <Link
+          href="/courses"
+          className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-blue-700 shadow-md transition"
+        >
+          Explore More Lectures
+        </Link>
       </div>
     </section>
   );

@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 // components/Header.tsx
 const Header = () => {
   return (
@@ -5,7 +7,7 @@ const Header = () => {
       className="relative bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 text-white text-center py-28 md:py-36 overflow-hidden"
       style={{
         backgroundImage:
-          "linear-gradient(rgba(18, 52, 59, 0.85), rgba(45, 84, 94, 0.9)), url('https://images.unsplash.com/photo-1596495577886-d920f1fb7238?auto=format&fit=crop&w=1350&q=80')",
+          "linear-gradient(rgba(18, 52, 59, 0.85), rgba(45, 84, 94, 0.9)), url('/images/Landingpage/headrbg.jpeg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -29,9 +31,12 @@ const Header = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </button>
-          <button className="border-2 border-yellow-300 text-yellow-300 px-8 py-4 rounded-full font-semibold hover:bg-yellow-300 hover:text-blue-800 transition-all duration-300 backdrop-blur-sm">
+          <Link href="/courses">
+             <button className="border-2 border-yellow-300 text-yellow-300 px-8 py-4 rounded-full font-semibold hover:bg-yellow-300 hover:text-blue-800 transition-all duration-300 backdrop-blur-sm">
             View Courses
           </button>
+          </Link>
+         
         </div>
         
         {/* Stats Section */}
