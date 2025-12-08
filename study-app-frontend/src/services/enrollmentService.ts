@@ -1,4 +1,4 @@
-import {studentEnrollment} from "@/types/studentEnrollment";
+import {studentEnrollment,studentEnrollmentlist} from "@/types/studentEnrollment";
 import axiosInstance from "@/services/axiosInstance";
 import axios from "axios";
 
@@ -17,7 +17,7 @@ export async function enrollStudent(enroll:studentEnrollment){
 
 }
 
-export const getAllEnrollStudent = async (): Promise<studentEnrollment[]> => {
-    const response = await axiosInstance.get<studentEnrollment[]>(`/StudentEnrollment/GetAllEnrollStudent`);
+export const getAllEnrollStudent = async (): Promise<studentEnrollmentlist[]> => {
+    const response = await axiosInstance.get<studentEnrollmentlist[]>(`/StudentEnrollment/GetAllEnrollStudent`);
     return response.data;
 };

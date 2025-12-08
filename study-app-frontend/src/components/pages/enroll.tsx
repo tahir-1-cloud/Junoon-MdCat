@@ -11,7 +11,6 @@ import { studentEnrollment } from "@/types/studentEnrollment";
 
 export default function EnrollPage() {
   const [formData, setFormData] = useState<studentEnrollment>({
-    id: 0,
     fullName: "",
     email: "",
     phoneNumber: "",
@@ -42,7 +41,6 @@ export default function EnrollPage() {
 
       // Reset form
       setFormData({
-        id: 0,
         fullName: "",
         email: "",
         phoneNumber: "",
