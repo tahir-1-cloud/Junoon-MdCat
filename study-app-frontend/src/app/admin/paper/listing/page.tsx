@@ -20,6 +20,7 @@ import { ColumnsType } from 'antd/es/table';
 import { getAllPapers, deletePaper, assignPaperToSession } from '@/services/paperService';
 import { QuestionService } from '@/services/QuestionService';
 import { getAllSessions } from '@/services/sessionService';
+import axiosInstance from '@/services/axiosInstance';
 import type { PaperModel } from '@/types/createPaper.model';
 import type { Question } from '@/services/QuestionService';
 import type { Session } from '@/types/session';
@@ -32,23 +33,24 @@ export default function Page() {
   const [searchTerm, setSearchTerm] = useState('');
   const [pageSize, setPageSize] = useState<number>(10);
 
-  // modal state for showing questions
+  // Questions modal
   const [modalVisible, setModalVisible] = useState(false);
   const [modalPaper, setModalPaper] = useState<PaperModel | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [qLoading, setQLoading] = useState(false);
   const [qError, setQError] = useState<string | null>(null);
 
-  // assign modal state
+  // Assign modal
   const [assignModalVisible, setAssignModalVisible] = useState(false);
   const [assignPaper, setAssignPaper] = useState<PaperModel | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [assignedSessionIds, setAssignedSessionIds] = useState<number[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
   const [assignLoading, setAssignLoading] = useState(false);
   const [sessionsError, setSessionsError] = useState<string | null>(null);
 
-  // track expanded rows (question ids) so we can toggle expand on Show button
+  // expanded rows for question options
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
 
   useEffect(() => {
@@ -118,6 +120,7 @@ export default function Page() {
     return false;
   }
 
+  // open questions modal
   const openQuestionsModal = async (paper: PaperModel) => {
     setModalPaper(paper);
     setModalVisible(true);
@@ -129,22 +132,18 @@ export default function Page() {
     try {
       const qs = await QuestionService.getQuestionsForPaper(Number(paper.id));
 
-      // Normalize: convert question id -> number when possible, and option.isCorrect -> boolean
       const normalized = (qs ?? []).map((q: any) => ({
         ...q,
         id: parseQuestionId(q),
         options: Array.isArray(q.options)
-          ? q.options.map((opt: any) => ({
-              ...opt,
-              isCorrect: parseIsCorrect(opt.isCorrect),
-            }))
+          ? q.options.map((opt: any) => ({ ...opt, isCorrect: parseIsCorrect(opt.isCorrect) }))
           : [],
       }));
 
       setQuestions(normalized);
     } catch (err: any) {
       console.error('Failed loading questions', err);
-      const msg = err?.response?.data ?? err?.message ?? String(err);
+      const msg = err?.response?.data ?? err?.message ?? 'Failed to load questions';
       setQError(typeof msg === 'string' ? msg : 'Failed to load questions');
     } finally {
       setQLoading(false);
@@ -160,13 +159,13 @@ export default function Page() {
     setExpandedRowKeys([]);
   };
 
-  // Toggle expanded state for a question (show/hide options)
+  // toggle show options for a question
   const toggleShowOptions = (question: Question) => {
     const key = parseQuestionId(question) ?? JSON.stringify(question);
     setExpandedRowKeys((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
   };
 
-  // Delete question by id (with confirmation)
+  // delete question
   const handleDeleteQuestion = async (questionId: number | undefined) => {
     if (questionId === undefined) {
       message.error('Question id not available');
@@ -176,9 +175,8 @@ export default function Page() {
     try {
       await QuestionService.deleteQuestion(questionId);
       message.success('Question deleted');
-
-      // refresh questions list
       if (modalPaper) {
+        // refresh modal list
         const qs = await QuestionService.getQuestionsForPaper(Number(modalPaper.id));
         const normalized = (qs ?? []).map((q: any) => ({
           ...q,
@@ -197,14 +195,13 @@ export default function Page() {
     }
   };
 
-  // ---------- NEW: Paper delete (with confirmation) ----------
+  // delete paper (and related data) - backend must cascade
   const handleDeletePaper = async (paperId: number | undefined) => {
     if (paperId === undefined) {
       message.error('Paper id not available');
       return;
     }
 
-    // Note: server is expected to cascade/remove connected entities (questions, attempts, results).
     try {
       await deletePaper(paperId);
       message.success('Paper deleted successfully (and related data).');
@@ -216,20 +213,27 @@ export default function Page() {
     }
   };
 
-  // ---------- NEW: Assign to batch modal ----------
+  // ---------- Assign modal: show all sessions, but render "Assigned" disabled for already-assigned ----------
   const openAssignModal = async (paper: PaperModel) => {
     setAssignPaper(paper);
     setAssignModalVisible(true);
     setSessions([]);
+    setAssignedSessionIds([]);
     setSessionsError(null);
     setSelectedSessionId(null);
     setSessionsLoading(true);
 
     try {
-      const s = await getAllSessions();
-      setSessions(s);
+      // 1) load all sessions (show them all so admin can see assigned items)
+      const all = await getAllSessions();
+      setSessions(all);
+
+      // 2) load paper details to get assigned session ids
+      const resp = await axiosInstance.get(`/Paper/GetPaperWithQuestion?paperId=${paper.id}`);
+      const assignedIds = resp?.data?.paperSessions?.map((ps: any) => Number(ps.sessionId)) ?? [];
+      setAssignedSessionIds(Array.from(new Set(assignedIds)));
     } catch (err: any) {
-      console.error('Failed to load sessions', err);
+      console.error('Failed to load sessions or paper assignments', err);
       setSessionsError('Failed to load sessions');
     } finally {
       setSessionsLoading(false);
@@ -240,6 +244,7 @@ export default function Page() {
     setAssignModalVisible(false);
     setAssignPaper(null);
     setSessions([]);
+    setAssignedSessionIds([]);
     setSessionsError(null);
     setSelectedSessionId(null);
     setAssignLoading(false);
@@ -266,6 +271,7 @@ export default function Page() {
     }
   };
 
+  // Table columns for papers
   const columns: ColumnsType<PaperModel> = [
     {
       title: '#',
@@ -352,6 +358,7 @@ export default function Page() {
     },
   ];
 
+  // Question table columns
   const questionColumns: ColumnsType<Question> = [
     {
       title: '#',
@@ -420,7 +427,7 @@ export default function Page() {
     },
   ];
 
-  // Render expanded row: show the options for the question with correct marked
+  // Render expanded row (options)
   const expandedRowRender = (q: Question) => {
     if (!q || !Array.isArray(q.options)) return null;
     return (
@@ -600,46 +607,103 @@ export default function Page() {
                   {
                     title: 'Action',
                     key: 'action',
-                    width: 140,
+                    width: 260,
                     render: (_: any, r: Session) => {
+                      const isAssigned = assignedSessionIds.includes(Number(r.id));
                       const isSelected = selectedSessionId === Number(r.id);
+
                       return (
                         <Space size="small">
-                          <Button
-                            size="small"
-                            onClick={() => setSelectedSessionId(Number(r.id))}
-                            style={{
-                              background: isSelected ? '#eef6ff' : 'white',
-                              border: '1px solid #e6e9ef',
-                            }}
-                          >
-                            {isSelected ? 'Selected' : 'Select'}
-                          </Button>
-                          <Button
-                            size="small"
-                            onClick={async () => {
-                              setSelectedSessionId(Number(r.id));
-                              setAssignLoading(true);
-                              try {
-                                if (!assignPaper) {
-                                  message.error('Paper not available');
-                                  return;
-                                }
-                                await assignPaperToSession(Number(assignPaper.id), Number(r.id));
-                                message.success('Paper assigned to session successfully.');
-                                closeAssignModal();
-                                await refreshPapers();
-                              } catch (err: any) {
-                                console.error('Failed to assign paper', err);
-                                const msg = err?.response?.data ?? err?.message ?? 'Failed to assign';
-                                message.error(typeof msg === 'string' ? msg : 'Failed to assign paper');
-                              } finally {
-                                setAssignLoading(false);
-                              }
-                            }}
-                          >
-                            Assign now
-                          </Button>
+                          {isAssigned ? (
+                            <>
+                              <Button
+                                size="small"
+                                disabled
+                                style={{ background: '#f3f4f6', color: '#6b7280', borderColor: '#e5e7eb' }}
+                              >
+                                Assigned
+                              </Button>
+
+                              <Popconfirm
+                                title="Unassign this paper from the session?"
+                                description="This will remove the paper from the session."
+                                onConfirm={async () => {
+                                  if (!assignPaper) {
+                                    message.error('Paper not available');
+                                    return;
+                                  }
+                                  setAssignLoading(true);
+                                  try {
+                                    // call unassign endpoint
+                                    await axiosInstance.post('/Paper/UnassignFromSession', {
+                                      paperId: Number(assignPaper.id),
+                                      sessionId: Number(r.id),
+                                    });
+
+                                    message.success('Paper unassigned successfully.');
+
+                                    // refresh assigned ids for this paper
+                                    const resp = await axiosInstance.get(
+                                      `/Paper/GetPaperWithQuestion?paperId=${assignPaper.id}`
+                                    );
+                                    const updatedAssigned =
+                                      resp?.data?.paperSessions?.map((ps: any) => Number(ps.sessionId)) ?? [];
+                                    setAssignedSessionIds(Array.from(new Set(updatedAssigned)));
+                                  } catch (err: any) {
+                                    console.error('Failed to unassign', err);
+                                    const msg = err?.response?.data ?? err?.message ?? 'Failed to unassign';
+                                    message.error(typeof msg === 'string' ? msg : 'Failed to unassign');
+                                  } finally {
+                                    setAssignLoading(false);
+                                  }
+                                }}
+                                okText="Unassign"
+                                cancelText="Cancel"
+                                getPopupContainer={() => document.body}
+                              >
+                                <Button size="small" danger loading={assignLoading}>
+                                  Unassign
+                                </Button>
+                              </Popconfirm>
+                            </>
+                          ) : (
+                            <>
+                              <Button
+                                size="small"
+                                type={isSelected ? 'primary' : 'default'}
+                                onClick={() => setSelectedSessionId(Number(r.id))}
+                                style={{ minWidth: 90 }}
+                              >
+                                {isSelected ? 'Selected' : 'Select'}
+                              </Button>
+
+                              <Button
+                                size="small"
+                                onClick={async () => {
+                                  setSelectedSessionId(Number(r.id));
+                                  setAssignLoading(true);
+                                  try {
+                                    if (!assignPaper) {
+                                      message.error('Paper not available');
+                                      return;
+                                    }
+                                    await assignPaperToSession(Number(assignPaper.id), Number(r.id));
+                                    message.success('Paper assigned to session successfully.');
+                                    closeAssignModal();
+                                    await refreshPapers();
+                                  } catch (err: any) {
+                                    console.error('Failed to assign paper', err);
+                                    const msg = err?.response?.data ?? err?.message ?? 'Failed to assign';
+                                    message.error(typeof msg === 'string' ? msg : 'Failed to assign paper');
+                                  } finally {
+                                    setAssignLoading(false);
+                                  }
+                                }}
+                              >
+                                Assign now
+                              </Button>
+                            </>
+                          )}
                         </Space>
                       );
                     },

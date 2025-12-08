@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using StudyApp.API.Domain.Entities;
 using StudyApp.API.Models;
 using StudyApp.API.Services.Interfaces;
 
@@ -34,8 +35,8 @@ namespace StudyApp.API.Controllers
         {
             try
             {
-                await _paperServices.GetPaperWithQuestions(paperId);
-                return Created();
+                PaperModel data=await _paperServices.GetPaperWithQuestions(paperId);
+                return Ok(data);
             }
             catch (Exception ex)
             {
@@ -92,5 +93,81 @@ namespace StudyApp.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> UnassignFromSession([FromBody] AssignDto model)
+        {
+            try
+            {
+                await _paperServices.UnassignPaperFromSession(model.PaperId, model.SessionId);
+                return Ok("Paper unassigned successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
+        #region Student Paper Actions
+
+        [HttpGet("{studentId}")]
+        public async Task<IActionResult> GetAssignedPapers(int studentId)
+        {
+            try
+            {
+                var data = await _paperServices.GetAssignedPapersForStudent(studentId);
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("{studentId}")]
+        public async Task<IActionResult> GetAttempts(int studentId)
+        {
+            try
+            {
+                var attempts = await _paperServices.GetAttemptsForStudent(studentId);
+                return Ok(attempts);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> StartAttempt([FromBody] StartAttemptModel model)
+        {
+            try
+            {
+                var resp = await _paperServices.StartAttempt(model);
+                return Ok(resp);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("{attemptId}")]
+        public async Task<IActionResult> GetAttempt(int attemptId)
+        {
+            try
+            {
+                var a = await _paperServices.GetAttemptById(attemptId);
+                if (a == null) return NotFound();
+                return Ok(a);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        #endregion
+
     }
 }

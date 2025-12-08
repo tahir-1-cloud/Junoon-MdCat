@@ -1,4 +1,5 @@
-﻿using StudyApp.API.Models;
+﻿using StudyApp.API.Domain.Entities;
+using StudyApp.API.Models;
 
 namespace StudyApp.API.Services.Interfaces
 {
@@ -10,5 +11,12 @@ namespace StudyApp.API.Services.Interfaces
 
         Task DeletePaper(int paperId);
         Task AssignPaperToSession(int paperId, int sessionId);
+        Task UnassignPaperFromSession(int paperId, int sessionId);
+
+        Task<IEnumerable<AssignedPaperDto>> GetAssignedPapersForStudent(int studentId);
+        Task<IEnumerable<StudentAttemptDto>> GetAttemptsForStudent(int studentId);
+        Task<StartAttemptResponse> StartAttempt(StartAttemptModel model);
+        Task<StudentAttemptDto?> GetAttemptById(int attemptId);
+
     }
 }

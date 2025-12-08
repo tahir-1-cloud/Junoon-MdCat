@@ -23,7 +23,7 @@ const navItems: NavItem[] = [
     {
         icon: <CalendarDaysIcon  className="w-5 h-5"/>,
         name: "Exams",
-        path: "/student/exams",
+        path: "/student/exams/listing",
     },
     {
         icon: <DocumentTextIcon  className="w-5 h-5"/>,

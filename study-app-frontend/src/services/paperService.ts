@@ -47,3 +47,7 @@ export const assignPaperToSession = async (paperId: number, sessionId: number): 
         throw error;
     }
 };
+
+export const unassignPaperFromSession = async (paperId: number, sessionId: number): Promise<void> => {
+  await axiosInstance.post('/Paper/UnassignFromSession', { paperId, sessionId });
+};
