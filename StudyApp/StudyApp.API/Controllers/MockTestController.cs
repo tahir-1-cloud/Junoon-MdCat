@@ -14,12 +14,14 @@ namespace StudyApp.API.Controllers
         private readonly IMockServices _mockServices;
         private readonly IMockQuestionServices _mockQuestionServices;
         private readonly IMockOptionServices _mockOptionServices;
+        private readonly ITestResultServices _testResultServices;
 
-        public MockTestController(IMockServices mockServices, IMockQuestionServices mockQuestionServices, IMockOptionServices mockOptionServices)
+        public MockTestController(IMockServices mockServices, IMockQuestionServices mockQuestionServices, IMockOptionServices mockOptionServices, ITestResultServices testResultServices)
         {
             _mockServices = mockServices;
             _mockQuestionServices = mockQuestionServices;
             _mockOptionServices = mockOptionServices;
+            _testResultServices = testResultServices;
         }
 
         [HttpPost]
@@ -95,6 +97,39 @@ namespace StudyApp.API.Controllers
             }
         }
 
+        //Mock Test Attempt
+
+        [HttpPost]
+        public async Task<IActionResult> AttemptMockTest([FromBody] SubmitTestDto model)
+        {
+            try
+            {
+                var result = await _testResultServices.SubmitTestAsync(model);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+
+
+        [HttpGet("{mockPaperId}")]
+
+        public async Task<IActionResult> GetAllMockTests()
+        {
+            try
+            {
+                List<MockTestSummaryDto> questions = await _mockServices.GetAllMockTestsAsync();
+                return Ok(questions);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }

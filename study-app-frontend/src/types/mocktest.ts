@@ -13,3 +13,42 @@ export interface MockModel {
 export interface MockQuestionModel{
     id: number;
 }
+
+
+
+export interface MockOption {
+  id: number;
+  optionText: string;
+  isCorrect: boolean;
+}
+
+export interface MockQuestion {
+  id: number;  
+  mockTestId: number;
+  title: string;
+  description?: string;
+  mockOptions: MockOption[];
+}
+export interface MocktestCounts{
+    id: number;
+    title:string;
+    totalQuestions:number
+}
+
+export interface SubmitAnswer {
+  questionId: number;
+  optionId: number;
+}
+
+export interface SubmitTestDto {
+  mockTestId: number;
+  answers: SubmitAnswer[];
+}
+
+export interface TestResult {
+  mockTestId: number;
+  correct: number;
+  incorrect: number;
+  total: number;
+  percentage: number;
+}

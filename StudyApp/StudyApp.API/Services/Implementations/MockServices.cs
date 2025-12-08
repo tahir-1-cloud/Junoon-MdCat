@@ -33,6 +33,14 @@ namespace StudyApp.API.Services.Implementations
             return enumerable.Adapt<IEnumerable<CreateMockTestDto>>();
         }
 
-        
+        public async Task<List<MockTestSummaryDto>> GetAllMockTestsAsync()
+        {
+            return await _mockRepository.GetAllMockTestsAsync();
+        }
+
+        public async Task<MockTest> GetMockTestWithQuestionsAsync(int id)
+        {
+            return await _mockRepository.GetMockTestWithQuestionsAsync(id);
+        }
     }
 }

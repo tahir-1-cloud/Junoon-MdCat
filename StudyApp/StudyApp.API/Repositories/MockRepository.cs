@@ -1,6 +1,8 @@
-﻿using StudyApp.API.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using StudyApp.API.Data;
 using StudyApp.API.Domain.Entities;
 using StudyApp.API.Domain.Interfaces;
+using StudyApp.API.Dto;
 
 namespace StudyApp.API.Repositories
 {
@@ -10,6 +12,24 @@ namespace StudyApp.API.Repositories
         {
         }
 
-      
+        public async Task<List<MockTestSummaryDto>> GetAllMockTestsAsync()
+        {
+            return await _context.MockTests
+                .Select(x => new MockTestSummaryDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    TotalQuestions = x.MockQuestions.Count
+                })
+                .ToListAsync();
+        }
+
+        public async Task<MockTest> GetMockTestWithQuestionsAsync(int id)
+        {
+            return await _context.MockTests
+                      .Include(x => x.MockQuestions)
+                          .ThenInclude(q => q.MockOptions)
+                      .FirstOrDefaultAsync(x => x.Id == id);
+        }
     }
 }

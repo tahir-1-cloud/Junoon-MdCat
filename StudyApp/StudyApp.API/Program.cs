@@ -31,6 +31,7 @@ builder.Services.AddScoped<IStudentEnrollRepository, StudentEnrollRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<ISubscriberRepository, SubscriberRepository>();
 builder.Services.AddScoped<ILecturesRepository, LecturesRepository>();
+builder.Services.AddScoped<ITestResultRepository, TestResultRepository>();
 
 
 
@@ -47,6 +48,7 @@ builder.Services.AddScoped<IStudentEnrollServices, StudentEnrollServices>();
 builder.Services.AddScoped<IContactServices, ContactServices>();
 builder.Services.AddScoped<ISubscriberServices, SubscriberServices>();
 builder.Services.AddScoped<ILectureServices, LectureServices>();
+builder.Services.AddScoped<ITestResultServices, TestResultServices>();
 
 
 

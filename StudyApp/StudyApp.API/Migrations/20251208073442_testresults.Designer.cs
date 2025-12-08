@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyApp.API.Data;
 
@@ -11,9 +12,11 @@ using StudyApp.API.Data;
 namespace StudyApp.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251208073442_testresults")]
+    partial class testresults
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -568,54 +571,6 @@ namespace StudyApp.API.Migrations
                     b.ToTable("Subscribers");
                 });
 
-            modelBuilder.Entity("StudyApp.API.Domain.Entities.TestResult", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Correct")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Incorrect")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MockTestId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Percentage")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Total")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MockTestId");
-
-                    b.ToTable("TestResults");
-                });
-
             modelBuilder.Entity("StudyApp.API.Domain.Entities.UserLogin", b =>
                 {
                     b.Property<int>("Id")
@@ -777,17 +732,6 @@ namespace StudyApp.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Paper");
-                });
-
-            modelBuilder.Entity("StudyApp.API.Domain.Entities.TestResult", b =>
-                {
-                    b.HasOne("StudyApp.API.Domain.Entities.MockTest", "MockTest")
-                        .WithMany()
-                        .HasForeignKey("MockTestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MockTest");
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.UserLogin", b =>

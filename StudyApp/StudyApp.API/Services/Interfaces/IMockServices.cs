@@ -10,6 +10,9 @@ namespace StudyApp.API.Services.Interfaces
 
         Task<IEnumerable<CreateMockTestDto>> GetMockPapers();
 
+        Task<List<MockTestSummaryDto>> GetAllMockTestsAsync();
+        Task<MockTest> GetMockTestWithQuestionsAsync(int id);
+
 
     }
 }
