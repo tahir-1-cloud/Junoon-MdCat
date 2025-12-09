@@ -4,7 +4,7 @@ export interface studentEnrollment{
     phoneNumber: string;
     preferredCourse: string;
     city?: string; // optional, matches C# nullable
-    status?: string;  
+    status: string;  
 }
 
 export interface studentEnrollmentlist{

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { GraduationCap, BookOpen, Phone, Send } from "lucide-react";
-import { toast } from "sonner";
+import Swal from "sweetalert2";
 
 import { enrollStudent } from "@/services/enrollmentService";
 import { studentEnrollment } from "@/types/studentEnrollment";
@@ -16,6 +16,7 @@ export default function EnrollPage() {
     phoneNumber: "",
     preferredCourse: "",
     city: "",
+    status:"",
   });
 
   const [loading, setLoading] = useState(false);
@@ -30,25 +31,39 @@ export default function EnrollPage() {
 
     // Validation
     if (!formData.fullName || !formData.email || !formData.phoneNumber || !formData.preferredCourse) {
-      toast.error("Please fill all required fields");
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Information",
+        text: "Please fill all required fields before enrolling.",
+      });
       return;
     }
 
     try {
       setLoading(true);
       await enrollStudent(formData);
-      toast.success("Enrollment successful!");
 
-      // Reset form
+      Swal.fire({
+        icon: "success",
+        title: "Enrollment Successful!",
+        text: "You’re now one step closer to acing your MDCAT entry test. Our team will contact you soon!",
+        confirmButtonColor: "#2563eb",
+      });
+
       setFormData({
         fullName: "",
         email: "",
         phoneNumber: "",
         preferredCourse: "",
         city: "",
+        status: "",
       });
     } catch (error: unknown) {
-      toast.error((error as Error)?.message || "Something went wrong. Try again.");
+      Swal.fire({
+        icon: "error",
+        title: "Something Went Wrong",
+        text: (error as Error)?.message || "Try again in a moment.",
+      });
     } finally {
       setLoading(false);
     }
