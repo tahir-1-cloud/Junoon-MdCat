@@ -33,6 +33,8 @@ namespace StudyApp.API.Data
         public DbSet<Lecture> Lectures { get; set; }
         public DbSet<TestResult> TestResults { get; set; }
 
+        public DbSet<TestResultAnswer> TestResultAnswers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -48,6 +50,8 @@ namespace StudyApp.API.Data
             modelBuilder.Entity<Lecture>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<Subscriber>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<ContactMessage>().HasQueryFilter(x => !x.IsDeleted);
+            modelBuilder.Entity<TestResult>().HasQueryFilter(x => !x.IsDeleted);
+
 
 
 
@@ -102,7 +106,26 @@ namespace StudyApp.API.Data
             modelBuilder.Entity<StudentAttempt>()
                 .Property(a => a.Score)
                 .HasPrecision(10, 2);
+
+            modelBuilder.Entity<TestResultAnswer>()
+                .HasOne(a => a.TestResult)
+                .WithMany(r => r.TestResultAnswers)
+                .HasForeignKey(a => a.TestResultId)
+                .OnDelete(DeleteBehavior.Cascade);   // ALLOWED
+
+                    modelBuilder.Entity<TestResultAnswer>()
+                        .HasOne(a => a.Question)
+                        .WithMany()
+                        .HasForeignKey(a => a.QuestionId)
+                        .OnDelete(DeleteBehavior.Restrict);  // FIXED
+
+                    modelBuilder.Entity<TestResultAnswer>()
+                        .HasOne(a => a.SelectedOption)
+                        .WithMany()
+                        .HasForeignKey(a => a.SelectedOptionId)
+                        .OnDelete(DeleteBehavior.Restrict);  // FIXED
         }
+        
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

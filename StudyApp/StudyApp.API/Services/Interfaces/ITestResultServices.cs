@@ -1,5 +1,6 @@
 ﻿using StudyApp.API.Domain.Entities;
 using StudyApp.API.Dto;
+using StudyApp.API.Models;
 
 namespace StudyApp.API.Services.Interfaces
 {
@@ -7,6 +8,9 @@ namespace StudyApp.API.Services.Interfaces
     {
         Task<TestResultDto> SubmitTestAsync(SubmitTestDto dto);
 
-        //Task<List<TestResult>> GetResultsByTestIdAsync(int mockTestId);
+        Task<MockResultAdminDto> GetTestResultForAdminAsync(int testResultId);
+
+        Task<IEnumerable<MockTestResultModel>> GetAllMockTestResults();
+
     }
 }

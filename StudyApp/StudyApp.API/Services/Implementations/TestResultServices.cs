@@ -1,6 +1,8 @@
-﻿using StudyApp.API.Domain.Entities;
+﻿using Mapster;
+using StudyApp.API.Domain.Entities;
 using StudyApp.API.Domain.Interfaces;
 using StudyApp.API.Dto;
+using StudyApp.API.Models;
 using StudyApp.API.Repositories;
 using StudyApp.API.Services.Interfaces;
 
@@ -16,7 +18,6 @@ namespace StudyApp.API.Services.Implementations
             _mockRepository = mockRepository;
         }
 
-
         public async Task<TestResultDto> SubmitTestAsync(SubmitTestDto dto)
         {
             // 1️⃣ Get the test with questions and options
@@ -25,14 +26,23 @@ namespace StudyApp.API.Services.Implementations
 
             // 2️⃣ Calculate correct answers
             int correct = 0;
+            List<TestResultAnswer> answerEntities = new List<TestResultAnswer>();
+
             foreach (var answer in dto.Answers)
             {
                 var question = test.MockQuestions.FirstOrDefault(q => q.Id == answer.QuestionId);
                 if (question == null) continue;
 
                 var option = question.MockOptions.FirstOrDefault(o => o.Id == answer.OptionId);
-                if (option != null && option.IsCorrect)
-                    correct++;
+                bool isCorrect = option != null && option.IsCorrect;
+
+                if (isCorrect) correct++;
+
+                answerEntities.Add(new TestResultAnswer
+                {
+                    QuestionId = question.Id,
+                    SelectedOptionId = option?.Id ?? 0
+                });
             }
 
             int total = test.MockQuestions.Count;
@@ -47,6 +57,7 @@ namespace StudyApp.API.Services.Implementations
                 Incorrect = incorrect,
                 Total = total,
                 Percentage = percentage,
+                TestResultAnswers = answerEntities,
                 CreatedAt = DateTime.Now
             };
 
@@ -62,6 +73,38 @@ namespace StudyApp.API.Services.Implementations
                 Percentage = result.Percentage,
                 CreatedAt = result.CreatedAt
             };
+        }
+
+        public async Task<MockResultAdminDto> GetTestResultForAdminAsync(int testResultId)
+        {
+            var result = await _testResultRepository.GetMockResultWithDetailsAsync(testResultId);
+            if (result == null) return null;
+
+            return new MockResultAdminDto
+            {
+                TestResultId = result.Id,
+                MockTestId = result.MockTestId,
+                Correct = result.Correct,
+                Incorrect = result.Incorrect,
+                Total = result.Total,
+                Percentage = result.Percentage,
+                AttemptDate = result.CreatedAt,
+                Details = result.TestResultAnswers.Select(a => new MockTestResultDto
+                {
+                    QuestionText = a.Question.Title,
+                    SelectedOption = a.SelectedOption.OptionText,
+                    CorrectOption = a.Question.MockOptions.First(o => o.IsCorrect).OptionText,
+                    IsCorrect = a.SelectedOption.IsCorrect
+                }).ToList()
+            };
+
+        }
+
+
+        public async Task<IEnumerable<MockTestResultModel>> GetAllMockTestResults()
+        {
+            IEnumerable<TestResult> enumerable = await _testResultRepository.GetAsync();
+            return enumerable.Adapt<IEnumerable<MockTestResultModel>>();
         }
     }
 }

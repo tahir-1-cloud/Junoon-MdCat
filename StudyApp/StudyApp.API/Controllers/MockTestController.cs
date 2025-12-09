@@ -131,5 +131,35 @@ namespace StudyApp.API.Controllers
             }
         }
 
+        //Admin side code to show mock resut with questions and answers
+        [HttpGet("{testResultId}")]
+        public async Task<IActionResult> GetMockTestWithQuestions(int testResultId)
+        {
+            try
+            {
+                var mockresult = await _testResultServices.GetTestResultForAdminAsync(testResultId);
+                return Ok(mockresult);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetMockResults()
+        {
+            try
+            {
+                IEnumerable<MockTestResultModel> mockresult = await _testResultServices.GetAllMockTestResults();
+                return Ok(mockresult);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
     }
 }

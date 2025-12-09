@@ -26,10 +26,17 @@ namespace StudyApp.API.Repositories
 
         public async Task<MockTest> GetMockTestWithQuestionsAsync(int id)
         {
-            return await _context.MockTests
-                      .Include(x => x.MockQuestions)
-                          .ThenInclude(q => q.MockOptions)
-                      .FirstOrDefaultAsync(x => x.Id == id);
+
+            var test = await _context.MockTests
+                    .Include(x => x.MockQuestions)
+                    .ThenInclude(q => q.MockOptions)
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (test == null)
+                throw new KeyNotFoundException($"Mock test {id} not found.");
+
+            return test;
+
         }
     }
 }
