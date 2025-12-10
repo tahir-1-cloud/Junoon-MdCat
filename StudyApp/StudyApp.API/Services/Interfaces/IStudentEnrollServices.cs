@@ -7,5 +7,7 @@ namespace StudyApp.API.Services.Interfaces
         Task AddEnrollmentAsync(StudentEnrollModel model);
 
         Task<IEnumerable<StudentEnrollModel>> GetEnrollStudents();
+
+        Task DeleteStudent(int studentId);
     }
 }

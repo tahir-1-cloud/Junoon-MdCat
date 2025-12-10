@@ -52,3 +52,30 @@ export interface TestResult {
   total: number;
   percentage: number;
 }
+
+
+export interface MockTestResults {
+  id: number;
+  correct: number;
+  incorrect: number;
+  total: number;
+  percentage: number;
+}
+
+export interface MockTestAnswerDetail {
+    questionText: string;
+    selectedOption: string;
+    correctOption: string;
+    isCorrect: boolean;
+}
+
+export interface MockTestResultDetail {
+    testResultId: number;
+    mockTestId: number;
+    correct: number;
+    incorrect: number;
+    total: number;
+    percentage: number;
+    attemptDate: string;
+    details: MockTestAnswerDetail[];
+}

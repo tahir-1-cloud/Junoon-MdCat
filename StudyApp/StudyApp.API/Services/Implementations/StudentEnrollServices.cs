@@ -35,5 +35,10 @@ namespace StudyApp.API.Services.Implementations
 
             await _studentEnrollRepository.AddAsync(enrollment);
         }
+
+        public async Task DeleteStudent(int studentId)
+        {
+            await _studentEnrollRepository.DeleteEnrolledStudentAsync(studentId);
+        }
     }
 }

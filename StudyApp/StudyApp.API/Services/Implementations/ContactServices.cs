@@ -36,5 +36,10 @@ namespace StudyApp.API.Services.Implementations
             IEnumerable<ContactMessage> enumerable = await _contactRepository.GetAsync();
             return enumerable.Adapt<IEnumerable<ContactMessageModel>>();
         }
+
+        public async Task DeleteContactInfo(int contactId)
+        {
+            await _contactRepository.DeleteContactInfoAsync(contactId);
+        }
     }
 }

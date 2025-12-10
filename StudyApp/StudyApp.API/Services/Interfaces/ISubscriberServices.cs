@@ -7,5 +7,7 @@ namespace StudyApp.API.Services.Interfaces
         Task AddSubscriber(SubscriberModel request);
 
         Task<IEnumerable<SubscriberModel>> GetSubscriberInfo();
+
+        Task DeleteSubscriber(int subscriberId);
     }
 }

@@ -43,5 +43,25 @@ namespace StudyApp.API.Controllers
                 return BadRequest(ex);
             }
         }
+
+
+        [HttpDelete("{studentId}")]
+        public async Task<IActionResult> DeleteStudents(int studentId)
+        {
+            try
+            {
+                await _studentEnrollServices.DeleteStudent(studentId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                // log ex if you have logger
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

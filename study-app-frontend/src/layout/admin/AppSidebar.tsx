@@ -59,7 +59,12 @@ const navItems: NavItem[] = [
             },
             {
                 name: "Listing", path: "/admin/mocktest/listing", pro: false
-            }],
+            },
+            {
+                name: "MockResult", path: "/admin/mocktest/mocktestresult", pro: false
+            }
+        ],
+            
     },
 
       {

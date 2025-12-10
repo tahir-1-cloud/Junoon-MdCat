@@ -34,5 +34,10 @@ namespace StudyApp.API.Services.Implementations
             IEnumerable<Subscriber> enumerable = await _subscriberRepository.GetAsync();
             return enumerable.Adapt<IEnumerable<SubscriberModel>>();
         }
+
+        public async Task DeleteSubscriber(int subscriberId)
+        {
+            await _subscriberRepository.DeleteSubscriberAsync(subscriberId);
+        }
     }
 }

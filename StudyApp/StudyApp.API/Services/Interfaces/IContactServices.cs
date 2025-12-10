@@ -7,5 +7,7 @@ namespace StudyApp.API.Services.Interfaces
         Task SendContactInfo(ContactMessageModel request);
 
         Task<IEnumerable<ContactMessageModel>> GetContactInfo();
+
+        Task DeleteContactInfo(int contactId);
     }
 }
