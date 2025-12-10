@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Table, Input, Select } from 'antd';
+import { Table, Input, Select, Button, Popconfirm, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { getAllSubscriber } from '@/services/publicServices';
+import { getAllSubscriber, deleteSubscriber } from '@/services/publicServices';
 import { subscriber } from '@/types/contactus';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 export default function SubscriberListPage() {
     const [subscribers, setSubscribers] = useState<subscriber[]>([]);
@@ -13,19 +14,19 @@ export default function SubscriberListPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [pageSize, setPageSize] = useState(10);
 
-    useEffect(() => {
-        const fetchSubscribers = async () => {
-            try {
-                const data = await getAllSubscriber();
-                setSubscribers(data);
-                setFilteredSubscribers(data);
-            } catch (error) {
-                console.error('Error fetching subscribers:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchSubscribers = async () => {
+        try {
+            const data = await getAllSubscriber();
+            setSubscribers(data);
+            setFilteredSubscribers(data);
+        } catch (error) {
+            console.error('Error fetching subscribers:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchSubscribers();
     }, []);
 
@@ -33,12 +34,28 @@ export default function SubscriberListPage() {
     const handleSearch = (value: string) => {
         setSearchTerm(value);
         const lower = value.toLowerCase();
-
         const filtered = subscribers.filter(
             (s) => s.email.toLowerCase().includes(lower)
         );
-
         setFilteredSubscribers(filtered);
+    };
+
+    // ✅ Delete handler
+    const handleDeleteSubscriber = async (subscriberId: number) => {
+        try {
+            await deleteSubscriber(subscriberId);
+            message.success('Subscriber deleted successfully.');
+            // Remove from local state
+            const updated = subscribers.filter(s => s.id !== subscriberId);
+            setSubscribers(updated);
+            setFilteredSubscribers(updated.filter(s =>
+                s.email.toLowerCase().includes(searchTerm.toLowerCase())
+            ));
+        } catch (error: any) {
+            console.error('Failed deleting subscriber', error);
+            const msg = error?.response?.data ?? error?.message ?? 'Failed to delete subscriber';
+            message.error(typeof msg === 'string' ? msg : 'Failed to delete subscriber');
+        }
     };
 
     const columns: ColumnsType<subscriber> = [
@@ -59,6 +76,30 @@ export default function SubscriberListPage() {
             key: 'createdAt',
             render: (date: Date) =>
                 date ? new Date(date).toLocaleDateString() : '—',
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: (_: unknown, record: subscriber) => (
+                <Popconfirm
+                    title="Delete subscriber?"
+                    description="This will permanently delete the subscriber. Are you sure?"
+                    onConfirm={() => handleDeleteSubscriber(Number(record.id))}
+                    okText="Delete"
+                    cancelText="Cancel"
+                    icon={<ExclamationCircleOutlined />}
+                    getPopupContainer={() => document.body}
+                >
+                    <Button
+                        danger
+                        type="primary"
+                        size="small"
+                        style={{ padding: '4px 10px', borderRadius: 20 }}
+                    >
+                        Delete
+                    </Button>
+                </Popconfirm>
+            ),
         },
     ];
 

@@ -1,32 +1,32 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Table, Input, Select } from 'antd';
+import { Table, Input, Select, Button, Popconfirm, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { studentEnrollment } from '@/types/studentEnrollment';
-import { getAllEnrollStudent } from '@/services/enrollmentService';
+import { studentEnrollmentlist } from '@/types/studentEnrollment';
+import { getAllEnrollStudent, deleteEnrollStudent } from '@/services/enrollmentService';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 export default function Page() {
-    const [students, setStudents] = useState<studentEnrollment[]>([]);
-    const [filteredStudents, setFilteredStudents] = useState<studentEnrollment[]>([]);
+    const [students, setStudents] = useState<studentEnrollmentlist[]>([]);
+    const [filteredStudents, setFilteredStudents] = useState<studentEnrollmentlist[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [pageSize, setPageSize] = useState(10);
 
-    // 🔄 Fetch students
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await getAllEnrollStudent();
-                setStudents(data);
-                setFilteredStudents(data);
-            } catch (error) {
-                console.error('Error fetching students:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchData = async () => {
+        try {
+            const data = await getAllEnrollStudent();
+            setStudents(data);
+            setFilteredStudents(data);
+        } catch (error) {
+            console.error('Error fetching students:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchData();
     }, []);
 
@@ -48,8 +48,30 @@ export default function Page() {
         setFilteredStudents(filtered);
     };
 
+    // ✅ Delete handler
+    const handleDeleteStudent = async (studentId: number) => {
+        try {
+            await deleteEnrollStudent(studentId);
+            message.success('Student deleted successfully.');
+            const updated = students.filter(s => s.id !== studentId);
+            setStudents(updated);
+            setFilteredStudents(updated.filter(s =>
+                s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                s.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                s.phoneNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                s.preferredCourse.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (s.city ? s.city.toLowerCase().includes(searchTerm.toLowerCase()) : false) ||
+                s.status.toLowerCase().includes(searchTerm.toLowerCase())
+            ));
+        } catch (error: any) {
+            console.error('Failed deleting student', error);
+            const msg = error?.response?.data ?? error?.message ?? 'Failed to delete student';
+            message.error(typeof msg === 'string' ? msg : 'Failed to delete student');
+        }
+    };
+
     // 📌 Table Columns
-    const columns: ColumnsType<studentEnrollment> = [
+    const columns: ColumnsType<studentEnrollmentlist> = [
         {
             title: '#',
             dataIndex: 'index',
@@ -98,6 +120,30 @@ export default function Page() {
                 >
                     {status}
                 </span>
+            ),
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: (_, record) => (
+                <Popconfirm
+                    title="Delete student?"
+                    description="This will permanently delete the enrolled student. Are you sure?"
+                    onConfirm={() => handleDeleteStudent(Number(record.id))}
+                    okText="Delete"
+                    cancelText="Cancel"
+                    icon={<ExclamationCircleOutlined />}
+                    getPopupContainer={() => document.body}
+                >
+                    <Button
+                        danger
+                        type="primary"
+                        size="small"
+                        style={{ padding: '4px 10px', borderRadius: 20 }}
+                    >
+                        Delete
+                    </Button>
+                </Popconfirm>
             ),
         },
     ];

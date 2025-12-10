@@ -40,3 +40,29 @@ export const getAllSubscriber = async (): Promise<subscriber[]> => {
     const response = await axiosInstance.get<subscriber[]>(`/Public/GetSubscriber`);
     return response.data;
 };
+
+export const deleteContactInfo = async (contactId: number): Promise<void> => {
+    try {
+        await axiosInstance.delete(`/Public/DeleteContactInformation/${contactId}`);
+    } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+            console.error("Error deleting paper:", error.response?.data || error.message);
+        } else {
+            console.error("Unexpected error deleting paper:", error);
+        }
+        throw error;
+    }
+};
+
+export const deleteSubscriber = async (subscriberId: number): Promise<void> => {
+    try {
+        await axiosInstance.delete(`/Public/DeleteSubscriber/${subscriberId}`);
+    } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+            console.error("Error deleting paper:", error.response?.data || error.message);
+        } else {
+            console.error("Unexpected error deleting paper:", error);
+        }
+        throw error;
+    }
+};

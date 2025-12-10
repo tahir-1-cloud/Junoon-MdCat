@@ -30,3 +30,4 @@ export const getMockResultDetail = async (id: number) => {
     const response = await axiosInstance.get(`/MockTest/GetMockTestWithQuestions/${id}`);
     return response.data;
 };
+

@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Table, Input, Select } from 'antd';
+import { Table, Input, Select, Button, Popconfirm, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { getAllContactInfo } from '@/services/publicServices';
+import { getAllContactInfo, deleteContactInfo } from '@/services/publicServices';
 import { contactus } from '@/types/contactus';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 export default function ContactListPage() {
     const [contacts, setContacts] = useState<contactus[]>([]);
@@ -13,35 +14,52 @@ export default function ContactListPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [pageSize, setPageSize] = useState(10);
 
-    useEffect(() => {
-        const fetchContacts = async () => {
-            try {
-                const data = await getAllContactInfo();
-                setContacts(data);
-                setFilteredContacts(data);
-            } catch (error) {
-                console.error('Error fetching contact list:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchContacts = async () => {
+        try {
+            const data = await getAllContactInfo();
+            setContacts(data);
+            setFilteredContacts(data);
+        } catch (error) {
+            console.error('Error fetching contact list:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchContacts();
     }, []);
 
-    // 🔍 Search filter handler
     const handleSearch = (value: string) => {
         setSearchTerm(value);
         const lower = value.toLowerCase();
-
         const filtered = contacts.filter(
             (c) =>
                 c.fullName.toLowerCase().includes(lower) ||
                 c.email.toLowerCase().includes(lower) ||
                 c.message.toLowerCase().includes(lower)
         );
-
         setFilteredContacts(filtered);
+    };
+
+    // ✅ Delete handler
+    const handleDeleteContact = async (contactId: number) => {
+        try {
+            await deleteContactInfo(contactId);
+            message.success('Contact deleted successfully.');
+            // Remove from local state
+            const updated = contacts.filter(c => c.id !== contactId);
+            setContacts(updated);
+            setFilteredContacts(updated.filter(c =>
+                c.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                c.message.toLowerCase().includes(searchTerm.toLowerCase())
+            ));
+        } catch (error: any) {
+            console.error('Failed deleting contact', error);
+            const msg = error?.response?.data ?? error?.message ?? 'Failed to delete contact';
+            message.error(typeof msg === 'string' ? msg : 'Failed to delete contact');
+        }
     };
 
     const columns: ColumnsType<contactus> = [
@@ -72,6 +90,30 @@ export default function ContactListPage() {
             key: 'createdAt',
             render: (date: Date) =>
                 date ? new Date(date).toLocaleDateString() : '—',
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: (_: unknown, record: contactus) => (
+                <Popconfirm
+                    title="Delete contact?"
+                    description="This will permanently delete the contact message. Are you sure?"
+                    onConfirm={() => handleDeleteContact(Number(record.id))}
+                    okText="Delete"
+                    cancelText="Cancel"
+                    icon={<ExclamationCircleOutlined />}
+                    getPopupContainer={() => document.body}
+                >
+                    <Button
+                        danger
+                        type="primary"
+                        size="small"
+                        style={{ padding: '4px 10px', borderRadius: 20 }}
+                    >
+                        Delete
+                    </Button>
+                </Popconfirm>
+            ),
         },
     ];
 
