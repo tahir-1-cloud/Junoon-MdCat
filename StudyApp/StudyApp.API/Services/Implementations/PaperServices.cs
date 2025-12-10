@@ -115,5 +115,11 @@ namespace StudyApp.API.Services.Implementations
             return await _papersRepository.GetAttemptById(attemptId);
         }
 
+        public async Task<StudentPaperDto?> GetStudentPaperAsync(int paperId)
+        {
+            var paper = await _papersRepository.GetStudentPaperAsync(paperId);
+            return paper;
+        }
+
     }
 }

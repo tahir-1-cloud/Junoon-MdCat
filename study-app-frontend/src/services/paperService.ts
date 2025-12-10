@@ -3,6 +3,40 @@ import axiosInstance from "@/services/axiosInstance";
 import axios from "axios";
 
 
+export interface StudentOptionDto {
+  id: number;
+  optionText: string;
+  isCorrect?: boolean | null;
+}
+
+export interface StudentQuestionDto {
+  id: number;
+  title: string;
+  description?: string | null;
+  options: StudentOptionDto[];
+}
+
+export interface StudentPaperSessionDto {
+  paperId: number;
+  sessionId: number;
+  sessionTitle?: string | null;
+}
+
+export interface StudentPaperDto {
+  id: number;
+  title: string;
+  testConductedOn?: string | null;
+  sessionId?: number | null;
+  sessionTitle?: string | null;
+  availableFrom?: string | null;
+  availableTo?: string | null;
+  durationMinutes?: number | null;
+  questions: StudentQuestionDto[];
+  paperSessions?: StudentPaperSessionDto[];
+}
+
+
+
 export async function addPaper(paper: CreatePaperModel) {
     try {
         const response = await axiosInstance.post('/Paper/AddPaper', paper);
@@ -50,4 +84,11 @@ export const assignPaperToSession = async (paperId: number, sessionId: number): 
 
 export const unassignPaperFromSession = async (paperId: number, sessionId: number): Promise<void> => {
   await axiosInstance.post('/Paper/UnassignFromSession', { paperId, sessionId });
+};
+
+export const getStudentPaper = async (paperId: number): Promise<StudentPaperDto> => {
+  const { data } = await axiosInstance.get<StudentPaperDto>("/Paper/GetPaperWithQuestionDto", {
+    params: { paperId },
+  });
+  return data;
 };

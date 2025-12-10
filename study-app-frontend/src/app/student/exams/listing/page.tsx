@@ -5,15 +5,16 @@ import { useEffect, useState } from 'react';
 import { Table, Button, Space, Tag, Spin, message, Modal } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   getAssignedPapersForStudent,
-  startAttempt,
+  startAttempt as startAttemptService,
   getAttemptsForStudent,
 } from '@/services/studentService';
-import type { AssignedPaperDto, StudentAttemptDto } from '@/types/student';
+import type { AssignedPaperDto, StudentAttemptDto} from '@/types/student';
+import type { StartAttemptResponse} from '@/services/studentService';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
-// TEMP: Replace with actual student auth
 function getStudentId(): number {
   return Number(process.env.NEXT_PUBLIC_TEST_STUDENT_ID ?? 1);
 }
@@ -26,10 +27,12 @@ export default function StudentAssignedTestsPage() {
   const [starting, setStarting] = useState<number | null>(null);
 
   const studentId = getStudentId();
+  const router = useRouter();
 
   useEffect(() => {
     loadAssigned();
     loadAttempts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadAssigned = async () => {
@@ -37,7 +40,8 @@ export default function StudentAssignedTestsPage() {
     try {
       const data = await getAssignedPapersForStudent(studentId);
       setAssigned(data);
-    } catch {
+    } catch (err) {
+      console.error(err);
       message.error('Failed to load assigned tests');
     } finally {
       setLoading(false);
@@ -48,7 +52,9 @@ export default function StudentAssignedTestsPage() {
     setAttemptsLoading(true);
     try {
       const data = await getAttemptsForStudent(studentId);
-      setAttempts(data);
+      setAttempts(data ?? []);
+    } catch (err) {
+      console.error(err);
     } finally {
       setAttemptsLoading(false);
     }
@@ -57,50 +63,56 @@ export default function StudentAssignedTestsPage() {
   const getAttemptForPaper = (paperId: number) =>
     attempts.find((a) => Number(a.paperId) === Number(paperId)) ?? null;
 
-  const startOrResume = async (paperId: number, availableFrom?: string | null, availableTo?: string | null) => {
+  async function handleStart(paperId: number) {
     const now = new Date();
-
-    if (availableFrom && new Date(availableFrom) > now) {
-      message.warning('This test is not open yet.');
-      return;
-    }
-    if (availableTo && new Date(availableTo) < now) {
-      message.warning('This test window has ended.');
-      return;
-    }
-
-    const att = getAttemptForPaper(paperId);
-
-    if (att?.status === 'Completed') {
-      message.info('Already completed — view result.');
-      return;
-    }
-
-    if (att?.status === 'InProgress') {
-      window.location.href = `/student/attempt/${att.id}`;
-      return;
+    const assignedRow = assigned.find((p) => p.id === paperId);
+    if (assignedRow) {
+      if (assignedRow.availableFrom && new Date(assignedRow.availableFrom) > now) {
+        message.warning('This test is not open yet.');
+        return;
+      }
+      if (assignedRow.availableTo && new Date(assignedRow.availableTo) < now) {
+        message.warning('This test window has ended.');
+        return;
+      }
     }
 
     Modal.confirm({
       title: 'Start Test?',
       icon: <ExclamationCircleOutlined />,
-      content: 'Timer will begin immediately.',
+      content: 'Timer will begin immediately. Are you sure you want to start?',
       okText: 'Start',
       cancelText: 'Cancel',
       onOk: async () => {
         try {
           setStarting(paperId);
-          const resp = await startAttempt({ paperId, studentId });
+          //const resp = await startAttemptService({ paperId, studentId }) as StartAttemptResponse;
+          const resp = await startAttemptService({ paperId, studentId });
+          if (!resp || !resp.attemptId) {
+            // use server message if available, otherwise fallback text
+            message.error(resp?.message ?? 'Failed to start attempt');
+            return;
+          }
+
           message.success('Test started!');
-          window.location.href = `/student/attempt/${resp.attemptId}`;
-        } catch {
-          message.error('Could not start attempt');
+          router.push(`/student/attempt/${resp.attemptId}`);
+        } catch (err: unknown) {
+          console.error(err);
+          if (err instanceof Error) {
+            message.error(err.message ?? 'Could not start attempt');
+          } else {
+            message.error('Could not start attempt');
+          }
         } finally {
           setStarting(null);
         }
       },
     });
-  };
+  }
+
+  function handleResume(attemptId: number) {
+    router.push(`/student/attempt/${attemptId}`);
+  }
 
   const columns: ColumnsType<AssignedPaperDto> = [
     {
@@ -168,14 +180,14 @@ export default function StudentAssignedTestsPage() {
                 type="primary"
                 disabled={disabled}
                 loading={starting === r.id}
-                onClick={() => startOrResume(r.id, r.availableFrom, r.availableTo)}
+                onClick={() => handleStart(r.id)}
               >
                 Start
               </Button>
             )}
 
             {att?.status === 'InProgress' && (
-              <Button type="primary" loading={starting === r.id} onClick={() => startOrResume(r.id)}>
+              <Button type="primary" loading={starting === r.id} onClick={() => handleResume(att.id)}>
                 Resume
               </Button>
             )}
@@ -186,7 +198,7 @@ export default function StudentAssignedTestsPage() {
               </Link>
             )}
 
-            <Link href={`/student/paper/${r.id}`}>
+            <Link href={`/student/exams/${r.id}/ViewDetails`}>
               <Button>Details</Button>
             </Link>
           </Space>

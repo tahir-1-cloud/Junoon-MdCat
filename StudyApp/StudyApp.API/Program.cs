@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using StudyApp.API.Data;
 using StudyApp.API.Domain.Interfaces;
+using StudyApp.API.Hubs;
 using StudyApp.API.Mappings;
 using StudyApp.API.Repositories;
 using StudyApp.API.Services.Implementations;
@@ -14,7 +15,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-
+builder.Services.AddSignalR();
 
 // Add Base Repository
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
@@ -32,6 +33,7 @@ builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<ISubscriberRepository, SubscriberRepository>();
 builder.Services.AddScoped<ILecturesRepository, LecturesRepository>();
 builder.Services.AddScoped<ITestResultRepository, TestResultRepository>();
+builder.Services.AddScoped<IAttemptRepository, AttemptRepository>();
 
 
 
@@ -49,6 +51,7 @@ builder.Services.AddScoped<IContactServices, ContactServices>();
 builder.Services.AddScoped<ISubscriberServices, SubscriberServices>();
 builder.Services.AddScoped<ILectureServices, LectureServices>();
 builder.Services.AddScoped<ITestResultServices, TestResultServices>();
+builder.Services.AddScoped<IAttemptService, AttemptService>();
 
 
 
@@ -94,11 +97,11 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseRouting();
-
 app.UseCors("StudyApp");
 
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<AttemptHub>("/hubs/attempt");
 
 app.Run();

@@ -18,5 +18,7 @@ namespace StudyApp.API.Services.Interfaces
         Task<StartAttemptResponse> StartAttempt(StartAttemptModel model);
         Task<StudentAttemptDto?> GetAttemptById(int attemptId);
 
+        Task<StudentPaperDto> GetStudentPaperAsync(int paperId);
+
     }
 }

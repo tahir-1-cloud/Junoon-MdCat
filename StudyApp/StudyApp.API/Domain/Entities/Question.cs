@@ -6,7 +6,8 @@
         public string Description { get; set; }
 
         public int PaperId { get; set; }
-        
+        public int Order { get; set; } = 0;
+
         // Enable lazy loading of the Paper reference
         public virtual Paper Paper { get; set; }
 

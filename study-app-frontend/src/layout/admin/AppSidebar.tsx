@@ -19,7 +19,7 @@ const navItems: NavItem[] = [
     {
         icon: <UserIcon className="w-5 h-5" />,
         name: "Admin Dashboard",
-        path: "/profile",
+        path: "/admin/dashboard",
     },
     {
         icon: <Squares2X2Icon className="w-5 h-5"  />,

@@ -7,6 +7,7 @@ namespace StudyApp.API.Models
         public int Id { get; set; }
         public string Title { get; set; }
         public DateTime TestConductedOn { get; set; }
+        public int DurationMinutes { get; set; }
         public List<QuestionModel> Questions { get; set; } = new();
         public List<PaperSessionModel>? PaperSessions { get; set; }
 
@@ -29,23 +30,79 @@ namespace StudyApp.API.Models
         public bool IsDeleted { get; set; }
     }
 
-    public class StudentAttempt
+    public class StudentAttempt : AuditEntity
     {
         public int Id { get; set; }
         public int PaperId { get; set; }
         public Paper Paper { get; set; } = null!;
-        public long StudentId { get; set; } // adjust type to your Users PK
+        public long StudentId { get; set; }
         public DateTime AttemptedOn { get; set; }
         public DateTime? StartedAt { get; set; }
         public DateTime? CompletedAt { get; set; }
         public decimal Score { get; set; }
         public bool IsDeleted { get; set; }
-        public string Status { get; set; }
-        // Add more fields as needed (answers JSON, duration, etc.)
+        public string Status { get; set; } = "NotStarted";
+        public int? UpdatedBy { get; set; }
+        public int? CreatedBy { get; set; }
+        public string? ActiveConnectionId { get; set; }
+        public bool IsActiveSession { get; set; } = false;
+    }
+
+    public class StudentAnswer : AuditEntity
+    {
+        public int Id { get; set; }
+        public int StudentAttemptId { get; set; }
+        public StudentAttempt StudentAttempt { get; set; } = null!;
+        public int QuestionId { get; set; }
+        public int? SelectedOptionId { get; set; }
+        public bool IsMarkedForReview { get; set; }
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
     public class AssignDto
     {
         public int PaperId { get; set; }
-        public int SessionId { get; set; } // uses int to match Session.Id (adjust if Session.Id is long)
+        public int SessionId { get; set; }
+    }
+
+
+
+    public class AttemptDto
+    {
+        public int Id { get; set; }
+        public int PaperId { get; set; }
+        public long StudentId { get; set; }
+        public DateTime AttemptedOn { get; set; }
+        public DateTime? StartedAt { get; set; }
+        public DateTime? CompletedAt { get; set; }
+        public string Status { get; set; } = "NotStarted";
+        public decimal Score { get; set; }
+        public int DurationMinutes { get; set; }
+        public List<QuestionForAttemptDto> Questions { get; set; } = new();
+    }
+
+    public class QuestionForAttemptDto
+    {
+        public int QuestionId { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public List<AttemptOptionDto> Options { get; set; } = new();
+    }
+
+    public class AttemptOptionDto
+    {
+        public int Id { get; set; }
+        public string OptionText { get; set; } = string.Empty;
+    }
+
+    public class SaveAnswerDto
+    {
+        public int AttemptId { get; set; }
+        public int QuestionId { get; set; }
+        public int? SelectedOptionId { get; set; }
+        public bool? MarkForReview { get; set; }
+    }
+
+    public class CompleteAttemptDto
+    {
+        public int AttemptId { get; set; }
     }
 }

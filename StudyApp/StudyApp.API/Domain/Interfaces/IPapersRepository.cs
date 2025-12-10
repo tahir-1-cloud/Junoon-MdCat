@@ -21,5 +21,8 @@ namespace StudyApp.API.Domain.Interfaces
         Task<StudentAttempt?> GetCompletedAttempt(int paperId, int studentId);
         Task AddAttempt(StudentAttempt attempt);
         Task<StudentAttemptDto?> GetAttemptById(int attemptId);
+
+        Task<StudentPaperDto?> GetStudentPaperAsync(int paperId);
+
     }
 }

@@ -10,10 +10,12 @@ namespace StudyApp.API.Controllers
     public class PaperController : ControllerBase
     {
         private readonly IPaperServices _paperServices;
+        private readonly IAttemptService _service;
 
-        public PaperController(IPaperServices paperServices)
+        public PaperController(IPaperServices paperServices, IAttemptService service)
         {
             _paperServices = paperServices;
+            _service = service;
         }
 
         [HttpPost]
@@ -41,6 +43,20 @@ namespace StudyApp.API.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex);
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetPaperWithQuestionDto(int paperId)
+        {
+            try
+            {
+                StudentPaperDto? dto = await _paperServices.GetStudentPaperAsync(paperId);
+                if (dto == null) return NotFound($"Paper with id {paperId} not found.");
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
@@ -151,21 +167,61 @@ namespace StudyApp.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        //[HttpGet("{attemptId}")]
+        //public async Task<IActionResult> GetAttempt(int attemptId)
+        //{
+        //    try
+        //    {
+        //        var a = await _paperServices.GetAttemptById(attemptId);
+        //        if (a == null) return NotFound();
+        //        return Ok(a);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
+
+
         [HttpGet("{attemptId}")]
         public async Task<IActionResult> GetAttempt(int attemptId)
         {
+            long studentId = long.Parse(User.FindFirst("id")?.Value ?? "0");
+            var attempt = await _service.GetAttemptAsync(attemptId);
+            //var attempt = await _service.GetAttemptAsync(attemptId, studentId);
+            if (attempt == null) return NotFound();
+            return Ok(attempt);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveAnswer([FromBody] SaveAnswerDto model)
+        {
+            long studentId = long.Parse(User.FindFirst("id")?.Value ?? "0");
             try
             {
-                var a = await _paperServices.GetAttemptById(attemptId);
-                if (a == null) return NotFound();
-                return Ok(a);
+                await _service.SaveAnswerAsync(model, studentId);
+                return Ok();
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CompleteAttempt([FromBody] CompleteAttemptDto model)
+        {
+            long studentId = long.Parse(User.FindFirst("id")?.Value ?? "0");
+            try
+            {
+                await _service.CompleteAttemptAsync(model, studentId);
+                return Ok();
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         #endregion
 
