@@ -27,9 +27,9 @@ export const deleteEnrollStudent = async (studentId: number): Promise<void> => {
         await axiosInstance.delete(`/StudentEnrollment/DeleteStudents/${studentId}`);
     } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
-            console.error("Error deleting paper:", error.response?.data || error.message);
+            console.error("Error deleting Students:", error.response?.data || error.message);
         } else {
-            console.error("Unexpected error deleting paper:", error);
+            console.error("Unexpected error deleting Students:", error);
         }
         throw error;
     }

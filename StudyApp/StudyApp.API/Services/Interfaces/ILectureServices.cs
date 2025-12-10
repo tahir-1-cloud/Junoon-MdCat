@@ -8,5 +8,7 @@ namespace StudyApp.API.Services.Interfaces
         Task AddLectureAsync(LectureDto request);
 
         Task<IEnumerable<LectureDto>> GetLectures();
+
+        Task Deletelectures(int lecturesId);
     }
 }

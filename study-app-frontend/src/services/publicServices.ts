@@ -46,9 +46,9 @@ export const deleteContactInfo = async (contactId: number): Promise<void> => {
         await axiosInstance.delete(`/Public/DeleteContactInformation/${contactId}`);
     } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
-            console.error("Error deleting paper:", error.response?.data || error.message);
+            console.error("Error deleting Subscriber:", error.response?.data || error.message);
         } else {
-            console.error("Unexpected error deleting paper:", error);
+            console.error("Unexpected error deleting Subscriber:", error);
         }
         throw error;
     }
@@ -59,9 +59,9 @@ export const deleteSubscriber = async (subscriberId: number): Promise<void> => {
         await axiosInstance.delete(`/Public/DeleteSubscriber/${subscriberId}`);
     } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
-            console.error("Error deleting paper:", error.response?.data || error.message);
+            console.error("Error deleting Subscriber:", error.response?.data || error.message);
         } else {
-            console.error("Unexpected error deleting paper:", error);
+            console.error("Unexpected error deleting Subscriber:", error);
         }
         throw error;
     }

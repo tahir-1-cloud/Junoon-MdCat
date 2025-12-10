@@ -18,3 +18,17 @@ export const getLectures = async (): Promise<LecturesModel[]> => {
     const response = await axiosInstance.get<LecturesModel[]>(`/PublicLectures/GetAlllectures`);
     return response.data;
 };
+
+
+export const deleteLecturesbyId = async (lecturesId: number): Promise<void> => {
+    try {
+        await axiosInstance.delete(`/PublicLectures/DeleteLecturesById/${lecturesId}`);
+    } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+            console.error("Error deleting Lectures:", error.response?.data || error.message);
+        } else {
+            console.error("Unexpected error deleting Lectures:", error);
+        }
+        throw error;
+    }
+};

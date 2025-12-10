@@ -34,5 +34,10 @@ namespace StudyApp.API.Services.Implementations
             IEnumerable<Lecture> enumerable = await _lecturesRepository.GetAsync();
             return enumerable.Adapt<IEnumerable<LectureDto>>();
         }
+
+        public async Task Deletelectures(int lecturesId)
+        {
+            await _lecturesRepository.DeleteLecturesAsync(lecturesId);
+        }
     }
 }

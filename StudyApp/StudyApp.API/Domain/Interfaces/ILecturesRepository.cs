@@ -4,6 +4,6 @@ namespace StudyApp.API.Domain.Interfaces
 {
     public interface ILecturesRepository:IBaseRepository<Lecture>
     {
-
+        Task DeleteLecturesAsync(int lecturesId);
     }
 }

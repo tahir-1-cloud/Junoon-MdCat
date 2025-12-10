@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Table, Input, Select, Modal } from 'antd';
+import { Table, Input, Select,Button, Modal, Popconfirm } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { getLectures } from '@/services/lecturesServices';
+import { getLectures,deleteLecturesbyId  } from '@/services/lecturesServices';
 import { LecturesModel } from '@/types/lecturesModel';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 export default function LecturesPage() {
     const [lectures, setLectures] = useState<LecturesModel[]>([]);
@@ -45,6 +46,19 @@ const convertToEmbedUrl = (url: string) => {
     }
 
     return url;
+};
+
+const handleDelete = async (id: number) => {
+    try {
+        await deleteLecturesbyId(id);
+
+        const updated = lectures.filter(l => l.id !== id);
+        setLectures(updated);
+        setFilteredLectures(updated);
+
+    } catch (error) {
+        console.error("Failed to delete lecture:", error);
+    }
 };
 
 
@@ -114,6 +128,30 @@ const convertToEmbedUrl = (url: string) => {
         </button>
     ),
 },
+ {
+            title: 'Action',
+            key: 'action',
+            render: (_: unknown, record: LecturesModel) => (
+                <Popconfirm
+                    title="Delete Lectures?"
+                    description="This will permanently delete the lectures. Are you sure?"
+                    onConfirm={() => handleDelete(Number(record.id))}
+                    okText="Delete"
+                    cancelText="Cancel"
+                    icon={<ExclamationCircleOutlined />}
+                    getPopupContainer={() => document.body}
+                >
+                    <Button
+                        danger
+                        type="primary"
+                        size="small"
+                        style={{ padding: '4px 10px', borderRadius: 20 }}
+                    >
+                        Delete
+                    </Button>
+                </Popconfirm>
+            ),
+        },
 
     ];
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StudyApp.API.Dto;
+using StudyApp.API.Migrations;
 using StudyApp.API.Models;
 using StudyApp.API.Services.Implementations;
 using StudyApp.API.Services.Interfaces;
@@ -71,6 +72,25 @@ namespace StudyApp.API.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex);
+            }
+        }
+
+        [HttpDelete("{lecturesId}")]
+        public async Task<IActionResult> DeleteLecturesById(int lecturesId)
+        {
+            try
+            {
+                await _lectureServices.Deletelectures(lecturesId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                // log ex if you have logger
+                return BadRequest(ex.Message);
             }
         }
     }
