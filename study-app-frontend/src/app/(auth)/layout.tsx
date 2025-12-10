@@ -40,14 +40,17 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </div>
 
           {/* Headline Text */}
-          <div className="text-center max-w-xs">
-            <h2 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
-              Best Preparation From The Comfort Of Your Home
-            </h2>
-            <p className="text-white/90 text-lg drop-shadow-sm">
-              Prepare for your exams anytime, anywhere with JUNOON MDCAT online platform.
-            </p>
-          </div>
+         <div className="text-center max-w-lg mx-auto">
+          <h3 className="text-4xl font-bold text-white mb-4 drop-shadow-lg leading-tight">
+            Best Preparation From The Comfort
+            Of Your Home
+          </h3>
+
+          <p className="text-white/90 text-lg drop-shadow-sm leading-normal">
+            Prepare for your exams anytime, anywhere with JUNOON MDCAT online platform.
+          </p>
+        </div>
+
 
           {/* Decorative Grid */}
           <div className="absolute inset-0 z-0">

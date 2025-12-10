@@ -8,7 +8,7 @@ const Footer = () => {
 
         {/* About Section */}
         <div>
-          <h3 className="text-2xl font-bold text-yellow-400 mb-3">EntryTestPro</h3>
+          <h3 className="text-2xl font-bold text-yellow-400 mb-3">JUNOON MDCAT</h3>
           <p className="text-gray-200 leading-relaxed">
             Your trusted academy for entry test preparation. Learn from expert instructors,
             attempt practice tests, and achieve your academic dreams.
