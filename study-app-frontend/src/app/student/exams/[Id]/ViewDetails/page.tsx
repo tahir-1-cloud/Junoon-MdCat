@@ -133,7 +133,7 @@ export default function ViewDetailsPage({ params }: { params: { Id: string } }) 
           const res = await startAttempt({ paperId, studentId });
           // start heartbeat locally and navigate
           startHeartbeatLoop(res.attemptId);
-          router.push(`/student/attempt/${res.attemptId}`);
+          router.push(`/student/exams/attempt/${res.attemptId}`);
         } catch (err: any) {
           const status = err?.response?.status;
           const data = err?.response?.data;
@@ -142,7 +142,7 @@ export default function ViewDetailsPage({ params }: { params: { Id: string } }) 
             // optionally navigate to result if you can fetch attempt
           } else if (err?.response?.data && err.response.data.attemptId) {
             // concurrent case where server returned existing attempt id in body
-            router.push(`/student/attempt/${err.response.data.attemptId}`);
+            router.push(`/student/exams/attempt/${err.response.data.attemptId}`);
           } else {
             console.error(err);
             message.error(err?.message || 'Could not start attempt');
@@ -248,7 +248,7 @@ export default function ViewDetailsPage({ params }: { params: { Id: string } }) 
 
                 {attempt?.status === 'InProgress' && (
                   <>
-                    <Button type="default" size="large" onClick={() => router.push(`/student/attempt/${attempt.id}`)}>
+                    <Button type="default" size="large" onClick={() => router.push(`/student/exams/attempt/${attempt.id}`)}>
                       Resume Test
                     </Button>
                     <Button className="ml-3" onClick={() => message.info('Resume the active attempt in the same browser/device.')}>

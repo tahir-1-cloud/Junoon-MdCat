@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using StudyApp.API.Data;
 using StudyApp.API.Domain.Entities;
 using StudyApp.API.Domain.Interfaces;
@@ -11,11 +12,13 @@ namespace StudyApp.API.Services.Implementations
     {
         private readonly IAttemptRepository _repo;
         private readonly ApplicationDbContext _ctx;
+        private readonly ILogger<AttemptService> _logger;
 
-        public AttemptService(IAttemptRepository repo, ApplicationDbContext ctx)
+        public AttemptService(IAttemptRepository repo, ApplicationDbContext ctx, ILogger<AttemptService> logger)
         {
             _repo = repo;
             _ctx = ctx;
+            _logger = logger;
         }
 
         //public async Task<AttemptDto?> GetAttemptAsync(int attemptId, long studentId)
@@ -98,6 +101,33 @@ namespace StudyApp.API.Services.Implementations
         public async Task RegisterHeartbeatAsync(int attemptId, string connectionId)
         {
             await Task.CompletedTask;
+        }
+
+        public async Task NotifyForceJoinAsync(int attemptId, long studentId, string connectionId)
+        {
+            var attempt = await _repo.GetByIdAsync(attemptId);
+            if (attempt == null)
+            {
+                _logger.LogWarning("NotifyForceJoinAsync: attempt {AttemptId} not found (student {StudentId}, conn {Conn})", attemptId, studentId, connectionId);
+                return;
+            }
+
+            _logger.LogInformation("NotifyForceJoinAsync: attempt {AttemptId} force-joined by student {StudentId} via connection {Conn} at {Time}",
+                attemptId, studentId, connectionId, DateTime.UtcNow);
+
+            var updatedAtProp = attempt.GetType().GetProperty("UpdatedAt");
+            if (updatedAtProp != null && updatedAtProp.CanWrite)
+            {
+                try
+                {
+                    updatedAtProp.SetValue(attempt, DateTime.UtcNow);
+                    await _repo.UpdateAttemptAsync(attempt);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to persist UpdatedAt for attempt {AttemptId} during force-join logging", attemptId);
+                }
+            }
         }
     }
 }

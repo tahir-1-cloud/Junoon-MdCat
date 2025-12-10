@@ -95,7 +95,7 @@ export default function StudentAssignedTestsPage() {
           }
 
           message.success('Test started!');
-          router.push(`/student/attempt/${resp.attemptId}`);
+          router.push(`/student/exams/attempt/${resp.attemptId}`);
         } catch (err: unknown) {
           console.error(err);
           if (err instanceof Error) {
@@ -111,7 +111,7 @@ export default function StudentAssignedTestsPage() {
   }
 
   function handleResume(attemptId: number) {
-    router.push(`/student/attempt/${attemptId}`);
+    router.push(`/student/exams/attempt/${attemptId}`);
   }
 
   const columns: ColumnsType<AssignedPaperDto> = [
