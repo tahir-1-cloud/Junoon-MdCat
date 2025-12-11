@@ -314,44 +314,37 @@ const AppSidebar: React.FC = () => {
                         ? "w-[290px]"
                         : "w-[90px]"
             }
-        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:translate-x-0`}
-            onMouseEnter={() => !isExpanded && setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            <div
-                className={`py-8 flex  ${
-                    !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-                }`}
-            >
-                <Link href="/public">
-                    {isExpanded || isHovered || isMobileOpen ? (
-                        <>
+                        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
+                        lg:translate-x-0`}
+                            onMouseEnter={() => !isExpanded && setIsHovered(true)}
+                            onMouseLeave={() => setIsHovered(false)}
+                        >
+                    <div
+                        className={`py-4 flex ${
+                            !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+                        }`}
+                        >
+                        <Link href="/admin/dashboard">
+                            {isExpanded || isHovered || isMobileOpen ? (
                             <Image
-                                className="dark:hidden"
-                                src="/images/logo/logo.svg"
+                                src="/images/logo/mdloginclr.png"
                                 alt="Logo"
-                                width={150}
+                                width={130}
                                 height={40}
+                                className="object-contain"
                             />
+                            ) : (
                             <Image
-                                className="hidden dark:block"
-                                src="/images/logo/logo-dark.svg"
+                                src="/images/logo/mdloginclr.png"
                                 alt="Logo"
-                                width={150}
-                                height={40}
+                                width={48}
+                                height={48}
+                                className="object-contain"
                             />
-                        </>
-                    ) : (
-                        <Image
-                            src="/images/logo/logo-icon.svg"
-                            alt="Logo"
-                            width={32}
-                            height={32}
-                        />
-                    )}
-                </Link>
-            </div>
+                            )}
+                        </Link>
+                    </div>
+
             <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
                 <nav className="mb-6">
                     <div className="flex flex-col gap-4">

@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { FaFacebookF, FaTwitter, FaYoutube, FaInstagram } from "react-icons/fa"
-
+import Image from "next/image";
 const Footer = () => {
   return (
     <footer className="bg-blue-700 text-white pt-12">
@@ -8,7 +8,16 @@ const Footer = () => {
 
         {/* About Section */}
         <div>
-          <h3 className="text-2xl font-bold text-yellow-400 mb-3">JUNOON MDCAT</h3>
+           <Link href="/" className="inline-block hover:opacity-80 transition">
+            <Image
+              src="/images/logo/mdlogohome.png"
+              alt="JUNOON MDCAT"
+              width={80}     // standard clean size
+              height={5}
+              className="object-contain"
+              priority
+            />
+          </Link>
           <p className="text-gray-200 leading-relaxed">
             Your trusted academy for entry test preparation. Learn from expert instructors,
             attempt practice tests, and achieve your academic dreams.
