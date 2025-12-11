@@ -7,5 +7,7 @@ namespace StudyApp.API.Domain.Interfaces
         Task<List<TestResult>> GetResultsByTestIdAsync(int mockTestId);
 
         Task<TestResult> GetMockResultWithDetailsAsync(int mockTestresultId);
+
+        Task DeleteTestResultsAsync(int testId);
     }
 }

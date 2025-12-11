@@ -12,5 +12,6 @@ namespace StudyApp.API.Services.Interfaces
 
         Task<IEnumerable<MockTestResultModel>> GetAllMockTestResults();
 
+        Task DeleteTestResults(int resultId);
     }
 }

@@ -31,3 +31,15 @@ export const getMockResultDetail = async (id: number) => {
     return response.data;
 };
 
+export const deletemockResult = async (resultId: number): Promise<void> => {
+    try {
+        await axiosInstance.delete(`/MockTest/DeleteMockResults/${resultId}`);
+    } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+            console.error("Error deleting Mock Results:", error.response?.data || error.message);
+        } else {
+            console.error("Unexpected error deleting Mock Results:", error);
+        }
+        throw error;
+    }
+};

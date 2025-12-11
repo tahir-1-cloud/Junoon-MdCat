@@ -161,5 +161,24 @@ namespace StudyApp.API.Controllers
             }
         }
 
+
+        [HttpDelete("{resultId}")]
+        public async Task<IActionResult> DeleteMockResults(int resultId)
+        {
+            try
+            {
+                await _testResultServices.DeleteTestResults(resultId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                // log ex if you have logger
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Table, Input, Select, Button, Modal, Tag } from 'antd';
+import { Table, Input, Select, Button, Modal, Tag , Popconfirm, message} from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { getAllMockResults, getMockResultDetail } from '@/services/mocktestService';
+import { getAllMockResults, getMockResultDetail,deletemockResult } from '@/services/mocktestService';
 import { MockTestResults,MockTestResultDetail } from '@/types/mocktest';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 export default function MockTestResultsPage() {
     const [results, setResults] = useState<MockTestResults[]>([]);
@@ -65,6 +66,37 @@ export default function MockTestResultsPage() {
 
         setFilteredResults(filtered);
     };
+    
+    // ✅ Delete handler
+    const handleDeleteMockResults = async (resultId: number) => {
+        try {
+            // Call API to delete
+            await deletemockResult(resultId);
+
+            // Success message
+            message.success('Mock test result deleted successfully.');
+
+            // Remove deleted item from state
+            const updatedResults = results.filter(r => r.id !== resultId);
+            setResults(updatedResults);
+
+            // Update filtered results based on search
+            setFilteredResults(
+                updatedResults.filter(r =>
+                    r.id.toString().includes(searchTerm.toLowerCase()) ||
+                    r.correct.toString().includes(searchTerm.toLowerCase()) ||
+                    r.incorrect.toString().includes(searchTerm.toLowerCase()) ||
+                    r.total.toString().includes(searchTerm.toLowerCase()) ||
+                    r.percentage.toString().includes(searchTerm.toLowerCase())
+                )
+            );
+        } catch (error: any) {
+            console.error('Failed to delete mock test result', error);
+            const msg = error?.response?.data ?? error?.message ?? 'Failed to delete mock test result';
+            message.error(typeof msg === 'string' ? msg : 'Failed to delete mock test result');
+        }
+    };
+
 
     const columns: ColumnsType<MockTestResults> = [
         {
@@ -95,14 +127,27 @@ export default function MockTestResultsPage() {
             render: (p: number) => `${p}%`,
         },
         {
-            title: 'Action',
-            key: 'action',
-            render: (_, record) => (
+        title: 'Action',
+        key: 'action',
+        render: (_, record) => (
+            <div className="flex gap-2">
                 <Button type="primary" onClick={() => handleViewDetail(record.id)}>
                     View Details
                 </Button>
-            ),
-        },
+
+                <Popconfirm
+                    title="Are you sure to delete this result?"
+                    onConfirm={() => handleDeleteMockResults(record.id)}
+                    okText="Yes"
+                    cancelText="No"
+                >
+                    <Button type="primary" danger>
+                        Delete
+                    </Button>
+                </Popconfirm>
+            </div>
+        ),
+    },
     ];
 
     return (

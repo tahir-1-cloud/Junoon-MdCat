@@ -106,5 +106,10 @@ namespace StudyApp.API.Services.Implementations
             IEnumerable<TestResult> enumerable = await _testResultRepository.GetAsync();
             return enumerable.Adapt<IEnumerable<MockTestResultModel>>();
         }
+
+        public async Task DeleteTestResults(int resultId)
+        {
+            await _testResultRepository.DeleteTestResultsAsync(resultId);
+        }
     }
 }
