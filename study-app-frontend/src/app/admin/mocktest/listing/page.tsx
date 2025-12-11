@@ -138,35 +138,32 @@ export default function Page() {
   };
 
   // Delete question by id (with confirmation)
-  const handleDeleteQuestion = async (questionId: number | undefined) => {
-    if (questionId === undefined) {
-      message.error('Question id not available');
-      return;
-    }
-
-    try {
-    //   await mockQuestionService.deleteQuestion(questionId);
-    //   message.success('Question deleted');
-
-      // refresh questions list
-      if (modalPaper) {
-        const qs = await mockQuestionService.getQuestionsForPaper(Number(modalPaper.id));
-        const normalized = (qs ?? []).map((q: any) => ({
-          ...q,
-          id: parseQuestionId(q),
-          options: Array.isArray(q.options)
-            ? q.options.map((opt: any) => ({ ...opt, isCorrect: parseIsCorrect(opt.isCorrect) }))
-            : [],
-        }));
-        setQuestions(normalized);
-        setExpandedRowKeys((prev) => prev.filter((k) => k !== questionId));
+    const handleDeleteQuestion = async (mockquestionId: number | undefined) => {
+      if (mockquestionId === undefined) {
+        message.error('Question id not available');
+        return;
       }
-    } catch (err: any) {
-      console.error('Delete failed', err, err?.response);
-      const msg = err?.response?.data ?? err?.message ?? 'Failed to delete';
-      message.error(typeof msg === 'string' ? msg : 'Failed to delete question');
-    }
-  };
+
+      try {
+        // Call API to delete the question
+        await mockQuestionService.deleteMockQuestion(mockquestionId);
+        message.success('Question deleted');
+
+        // Update the local state by filtering out the deleted question
+        const updatedQuestions = questions.filter(
+          (q) => (parseQuestionId(q) ?? 0) !== mockquestionId
+        );
+        setQuestions(updatedQuestions);
+
+        // Remove from expanded rows if it was expanded
+        setExpandedRowKeys((prev) => prev.filter((k) => k !== mockquestionId));
+      } catch (err: any) {
+        console.error('Delete failed', err, err?.response);
+        const msg = err?.response?.data ?? err?.message ?? 'Failed to delete';
+        message.error(typeof msg === 'string' ? msg : 'Failed to delete question');
+      }
+    };
+
 
   const columns: ColumnsType<MockModel> = [
     {
@@ -226,8 +223,6 @@ export default function Page() {
       ),
     },
   ];
-
-
 
   const questionColumns: ColumnsType<MockQuestion> = [
     {

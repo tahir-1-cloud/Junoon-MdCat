@@ -42,5 +42,11 @@ namespace StudyApp.API.Services.Implementations
             List<MockQuestionModel> questionModels = questions.Adapt<List<MockQuestionModel>>();
             return questionModels;
         }
+
+        public async Task DeleteMockQuestion(int mockquestionId)
+        {
+            // Let repository handle the retrieval and soft-delete
+            await _mockQuestionRepository.DeleteMockQuestionAsync(mockquestionId);
+        }
     }
 }   

@@ -180,5 +180,26 @@ namespace StudyApp.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpDelete("{mockquestionId}")]
+        public async Task<IActionResult> DeleteMockQuestionswithOption(int mockquestionId)
+        {
+            try
+            {
+                await _mockQuestionServices.DeleteMockQuestion(mockquestionId);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                // log ex.InnerException.Message
+                return BadRequest(new { message = ex.Message, inner = ex.InnerException?.Message });
+            }
+        }
     }
 }
+
+ 

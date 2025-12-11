@@ -8,5 +8,7 @@ namespace StudyApp.API.Services.Interfaces
 
         Task<List<MockQuestionModel>> GetMockQuestionsForPaperAsync(int MockpaperId);
 
+
+        Task DeleteMockQuestion(int mockquestionId);
     }
 }

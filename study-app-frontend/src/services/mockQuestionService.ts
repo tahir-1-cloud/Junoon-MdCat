@@ -37,8 +37,9 @@ export const mockQuestionService = {
         );
         return data;
     },
-    // async deleteQuestion(questionId: number): Promise<void> {
-    //     await axiosInstance.delete(`/Question/DeleteQuestion/${questionId}`);
-    // }
+    
+    async deleteMockQuestion(mockquestionId: number): Promise<void> {
+        await axiosInstance.delete(`/MockTest/DeleteMockQuestionswithOption/${mockquestionId}`);
+    }
 
 };
