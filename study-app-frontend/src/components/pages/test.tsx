@@ -89,6 +89,10 @@ export default function TestPage({ mockTestId }: TestPageProps) {
   };
 
   const handleSubmit = async () => {
+    if (questions.length === 0) {
+      Swal.fire("No Questions", "There are no questions available to attempt.", "warning");
+      return;
+    }
     if (answers.some(a => a.optionId === -1)) {
       Swal.fire("Incomplete", "Please attempt all questions before submitting.", "warning");
       return;
@@ -129,7 +133,7 @@ export default function TestPage({ mockTestId }: TestPageProps) {
             Attempt this mock test with a professional, entry-test-ready interface, and enroll to achieve 100% preparation.
           </p>
         </div>
-        <div className="text-right mb-6 text-xl font-bold text-red-600">
+        <div className="text-right mb-6 text-xl font-bold text-blue-600">
           ⏱ Time Left: {formatTime(timeLeft)}
         </div>
 

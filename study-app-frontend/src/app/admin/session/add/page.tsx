@@ -4,6 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { addSession } from '@/services/sessionService';
 import { Session } from '@/types/session';
+import {toast} from "sonner"
+import { DatePicker } from "antd";
+import dayjs from 'dayjs';
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(customParseFormat);
 
 export default function AddSessionPage() {
     const router = useRouter();
@@ -17,11 +23,40 @@ export default function AddSessionPage() {
     const [loading, setLoading] = useState(false);
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> 
+    | string 
+    | null,
+  name?: string
+) => {
+  // 👉 When DatePicker returns a string (selected date)
+  if (typeof e === "string" && name) {
+    setFormData({
+      ...formData,
+      [name]: e,
+    });
+    return;
+  }
+
+  // 👉 When DatePicker is cleared (null)
+  if (e === null && name) {
+    setFormData({
+      ...formData,
+      [name]: "",
+    });
+    return;
+  }
+
+  // 👉 Normal input / textarea / select
+  if (typeof e !== "string" && e?.target) {
+    const { name: fieldName, value } = e.target;
+
+    setFormData({
+      ...formData,
+      [fieldName]: value,
+    });
+  }
+};
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -34,11 +69,11 @@ export default function AddSessionPage() {
         try {
             setLoading(true);
             await addSession(sessionToSend);
-            alert('✅ Session added successfully!');
+             toast.success('Session added successfully!');
             router.push('/admin/session/listing');
         } catch (error) {
             console.error('Failed to add session:', error);
-            alert('❌ Error adding session.');
+             toast.error('Error adding session.');
         } finally {
             setLoading(false);
         }
@@ -71,18 +106,23 @@ export default function AddSessionPage() {
                         </div>
 
                         {/* Session Year */}
-                        <div>
-                            <label className="block mb-2 font-medium text-gray-700">
-                                Session Year
-                            </label>
-                            <input
-                                type="date"
-                                name="sessionYear"
-                                value={formData.sessionYear}
-                                onChange={handleChange}
-                                required
-                                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                         <div>
+                        <label className="block mb-1 font-medium text-gray-700">Session Year</label>
+                        <DatePicker
+                            value={formData.sessionYear? dayjs(formData.sessionYear) : null}
+                            onChange={(date) => {
+                                if (date) {
+                                const iso = date.toDate().toISOString();  
+                                handleChange(iso,"sessionYear");
+                                } else {
+                                handleChange("", "sessionYear");
+                                }
+                            }}
+                            format="DD-MM-YYYY"
+                            className="w-full border border-gray-300 rounded-lg px-4 py-[9px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            style={{ height: "40px" }}
                             />
+
                         </div>
                     </div>
 
