@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Microsoft.EntityFrameworkCore;
 using StudyApp.API.Domain.Entities;
 using StudyApp.API.Domain.Interfaces;
 using StudyApp.API.Models;
@@ -75,26 +76,63 @@ namespace StudyApp.API.Services.Implementations
             return await _papersRepository.GetAttemptsForStudent(studentId);
         }
 
+        //public async Task<StartAttemptResponse> StartAttempt(StartAttemptModel model)
+        //{
+        //    var paper = await _papersRepository.GetPaperWithQuestions(model.PaperId);
+        //    if (paper == null) throw new Exception("Paper not found");
+
+        //    var isAssigned = await _papersRepository.IsPaperAssignedToAnySession(model.PaperId);
+        //    if (!isAssigned)
+        //    {
+        //        throw new Exception("Paper is not assigned to any session");
+        //    }
+        //    var existing = await _papersRepository.GetInProgressAttempt(model.PaperId, model.StudentId);
+        //    if (existing != null)
+        //    {
+        //        return new StartAttemptResponse { AttemptId = existing.Id };
+        //    }
+        //    var completed = await _papersRepository.GetCompletedAttempt(model.PaperId, model.StudentId);
+        //    if (completed != null)
+        //    {
+        //        throw new Exception("You have already completed this test.");
+        //    }
+        //    model.StudentId = 3;
+        //    var newAttempt = new StudentAttempt
+        //    {
+        //        PaperId = model.PaperId,
+        //        StudentId = model.StudentId,
+        //        Status = "InProgress",
+        //        AttemptedOn = DateTime.UtcNow,
+        //        StartedAt = DateTime.UtcNow
+        //    };
+
+        //    await _papersRepository.AddAttempt(newAttempt);
+
+        //    return new StartAttemptResponse { AttemptId = newAttempt.Id };
+        //}
         public async Task<StartAttemptResponse> StartAttempt(StartAttemptModel model)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             var paper = await _papersRepository.GetPaperWithQuestions(model.PaperId);
-            if (paper == null) throw new Exception("Paper not found");
+            if (paper == null)
+                throw new Exception("Paper not found");
 
             var isAssigned = await _papersRepository.IsPaperAssignedToAnySession(model.PaperId);
             if (!isAssigned)
-            {
                 throw new Exception("Paper is not assigned to any session");
-            }
+
             var existing = await _papersRepository.GetInProgressAttempt(model.PaperId, model.StudentId);
             if (existing != null)
             {
                 return new StartAttemptResponse { AttemptId = existing.Id };
             }
+
             var completed = await _papersRepository.GetCompletedAttempt(model.PaperId, model.StudentId);
             if (completed != null)
-            {
                 throw new Exception("You have already completed this test.");
-            }
+
+             model.StudentId = 3;
 
             var newAttempt = new StudentAttempt
             {
@@ -105,10 +143,26 @@ namespace StudyApp.API.Services.Implementations
                 StartedAt = DateTime.UtcNow
             };
 
-            await _papersRepository.AddAttempt(newAttempt);
+            try
+            {
+                await _papersRepository.AddAttempt(newAttempt);
+            }
+            catch (DbUpdateException)
+            {
+                var concurrentAttempt = await _papersRepository.GetInProgressAttempt(model.PaperId, model.StudentId);
+                if (concurrentAttempt != null)
+                    return new StartAttemptResponse { AttemptId = concurrentAttempt.Id };
+
+                var completedAttempt = await _papersRepository.GetCompletedAttempt(model.PaperId, model.StudentId);
+                if (completedAttempt != null)
+                    throw new Exception("You have already completed this test.");
+
+                throw;
+            }
 
             return new StartAttemptResponse { AttemptId = newAttempt.Id };
         }
+
 
         public async Task<StudentAttemptDto?> GetAttemptById(int attemptId)
         {

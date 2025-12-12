@@ -1,4 +1,3 @@
-// src/app/student/exams/attempt/[attemptId]/page.tsx
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -6,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import * as signalR from '@microsoft/signalr';
 import { Card, Button, Space, Spin, Modal, message, Tag, Divider, Typography } from 'antd';
 import { getAttempt, saveAnswer, completeAttempt } from '@/services/attemptService';
-import type { AttemptDto } from '@/types/Attempt';
+import type { AttemptDto } from '@/types/attempt';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -339,13 +338,17 @@ export default function AttemptRunner({ params }: { params: { attemptId?: string
       onOk: async () => {
         if (didSubmitRef.current) return;
         didSubmitRef.current = true;
+
+        // stop timers & background work first
+        cleanup();
         try {
           const studentId = Number(localStorage.getItem('studentId') || attempt?.studentId || 0);
           console.info('[ATTEMPT][MANUAL] submit payload', { attemptId, studentId });
           await completeAttempt({ attemptId, studentId });
-          message.success('Submitted');
-          cleanup();
-          router.replace('/student/tests');
+
+          // After successful completeAttempt, redirect to results page (we fetch results there)
+          message.success('Submitted — showing results');
+          router.replace(`/student/exams/results/${attemptId}`);
         } catch (e) {
           console.error('CompleteAttempt failed', e);
           didSubmitRef.current = false;
@@ -363,13 +366,16 @@ export default function AttemptRunner({ params }: { params: { attemptId?: string
     }
 
     didSubmitRef.current = true;
+    // stop timers & background work
+    cleanup();
     try {
       const studentId = Number(localStorage.getItem('studentId') || attempt?.studentId || 0);
       console.info('[ATTEMPT][AUTO] auto-submitting attempt', { attemptId, studentId });
       await completeAttempt({ attemptId, studentId });
       message.info('Auto-submitted due to time or navigation');
-      cleanup();
-      router.replace('/student/tests');
+
+      // navigate to results page
+      router.replace(`/student/exams/results/${attemptId}`);
     } catch (e) {
       console.error('Auto-complete failed', e);
       didSubmitRef.current = false;

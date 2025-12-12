@@ -1,4 +1,5 @@
-﻿using StudyApp.API.Models;
+﻿using StudyApp.API.Dto;
+using StudyApp.API.Models;
 
 namespace StudyApp.API.Services.Interfaces
 {
@@ -13,6 +14,8 @@ namespace StudyApp.API.Services.Interfaces
         Task RegisterHeartbeatAsync(int attemptId, string connectionId);
 
         Task NotifyForceJoinAsync(int attemptId, long studentId, string connectionId);
+
+        Task<AttemptResultDto?> GetAttemptResultAsync(int attemptId, long requestingStudentId);
 
     }
 }

@@ -92,7 +92,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasIndex("SessionId");
 
-                    b.ToTable("ApplicationUsers");
+                    b.ToTable("ApplicationUsers", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.ContactMessage", b =>
@@ -137,7 +137,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ContactMessages");
+                    b.ToTable("ContactMessages", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.Lecture", b =>
@@ -184,7 +184,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Lectures");
+                    b.ToTable("Lectures", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.Lecturedetails", b =>
@@ -231,7 +231,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Lecturedetails");
+                    b.ToTable("Lecturedetails", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.MockOption", b =>
@@ -274,7 +274,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasIndex("MockQuestionId");
 
-                    b.ToTable("MockOptions");
+                    b.ToTable("MockOptions", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.MockQuestion", b =>
@@ -318,7 +318,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasIndex("MockTestId");
 
-                    b.ToTable("MockQuestions");
+                    b.ToTable("MockQuestions", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.MockTest", b =>
@@ -356,7 +356,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MockTests");
+                    b.ToTable("MockTests", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.Option", b =>
@@ -399,7 +399,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("Options");
+                    b.ToTable("Options", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.Paper", b =>
@@ -440,7 +440,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Papers");
+                    b.ToTable("Papers", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.Question", b =>
@@ -487,7 +487,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasIndex("PaperId");
 
-                    b.ToTable("Questions");
+                    b.ToTable("Questions", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.Session", b =>
@@ -529,7 +529,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sessions");
+                    b.ToTable("Sessions", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.StudentEnrollment", b =>
@@ -583,7 +583,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StudentEnrollments");
+                    b.ToTable("StudentEnrollments", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.StudentLecture", b =>
@@ -634,7 +634,7 @@ namespace StudyApp.API.Migrations
                     b.HasIndex("StudentId", "LecturedetailId")
                         .IsUnique();
 
-                    b.ToTable("StudentLectures");
+                    b.ToTable("StudentLectures", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.Subscriber", b =>
@@ -669,7 +669,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subscribers");
+                    b.ToTable("Subscribers", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.TestResult", b =>
@@ -717,7 +717,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasIndex("MockTestId");
 
-                    b.ToTable("TestResults");
+                    b.ToTable("TestResults", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.TestResultAnswer", b =>
@@ -763,7 +763,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasIndex("TestResultId");
 
-                    b.ToTable("TestResultAnswers");
+                    b.ToTable("TestResultAnswers", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.UserLogin", b =>
@@ -806,7 +806,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserLogins");
+                    b.ToTable("UserLogins", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Models.PaperSession", b =>
@@ -830,7 +830,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasIndex("SessionId");
 
-                    b.ToTable("PaperSessions");
+                    b.ToTable("PaperSessions", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Models.StudentAnswer", b =>
@@ -875,7 +875,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasIndex("StudentAttemptId");
 
-                    b.ToTable("StudentAnswers");
+                    b.ToTable("StudentAnswers", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Models.StudentAttempt", b =>
@@ -937,7 +937,7 @@ namespace StudyApp.API.Migrations
 
                     b.HasIndex("PaperId");
 
-                    b.ToTable("StudentAttempts");
+                    b.ToTable("StudentAttempts", (string)null);
                 });
 
             modelBuilder.Entity("StudyApp.API.Domain.Entities.ApplicationUser", b =>

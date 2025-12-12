@@ -1,4 +1,5 @@
 ﻿using StudyApp.API.Domain.Entities;
+using StudyApp.API.Dto;
 using StudyApp.API.Models;
 
 namespace StudyApp.API.Domain.Interfaces
@@ -12,5 +13,7 @@ namespace StudyApp.API.Domain.Interfaces
         Task SaveAnswerAsync(StudentAnswer answer);
         Task<List<StudentAnswer>> GetAnswersForAttemptAsync(int attemptId);
         Task UpdateAttemptAsync(StudentAttempt attempt);
+
+        Task<AttemptEntity?> GetAttemptWithQuestionsAsync(int attemptId);
     }
 }

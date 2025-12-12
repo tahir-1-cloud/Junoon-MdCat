@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using StudyApp.API.Data;
 using StudyApp.API.Domain.Entities;
 using StudyApp.API.Domain.Interfaces;
+using StudyApp.API.Dto;
 using StudyApp.API.Models;
 using StudyApp.API.Services.Interfaces;
 
@@ -128,6 +129,69 @@ namespace StudyApp.API.Services.Implementations
                     _logger.LogWarning(ex, "Failed to persist UpdatedAt for attempt {AttemptId} during force-join logging", attemptId);
                 }
             }
+        }
+
+        public async Task<AttemptResultDto?> GetAttemptResultAsync(int attemptId, long requestingStudentId)
+        {
+            var attemptEntity = await _repo.GetAttemptWithQuestionsAsync(attemptId);
+            if (attemptEntity == null) return null;
+
+            if (attemptEntity.StudentId != requestingStudentId)
+            {
+                throw new UnauthorizedAccessException("Not authorized for this attempt.");
+            }
+
+            var dto = new AttemptResultDto
+            {
+                AttemptId = attemptEntity.AttemptId,
+                StudentId = attemptEntity.StudentId,
+                Status = attemptEntity.Status,
+                DurationMinutes = attemptEntity.DurationMinutes,
+                AttemptedOn = attemptEntity.AttemptedOn
+            };
+
+            int total = 0;
+            int correct = 0;
+            var qList = new List<QuestionResultDto>();
+
+            foreach (var q in attemptEntity.Questions.OrderBy(qe => qe.Order ?? 0))
+            {
+                var qDto = new QuestionResultDto
+                {
+                    QuestionId = q.QuestionId,
+                    Title = q.Title,
+                    Explanation = q.Explanation
+                };
+
+                var savedAnswer = attemptEntity.SavedAnswers?.FirstOrDefault(sa => sa.QuestionId == q.QuestionId);
+                int? userOptionId = savedAnswer?.SelectedOptionId;
+                qDto.UserOptionId = userOptionId;
+
+                foreach (var opt in q.Options.OrderBy(o => o.Order ?? 0))
+                {
+                    qDto.Options.Add(new OptionResultDto
+                    {
+                        Id = opt.OptionId,
+                        OptionText = opt.OptionText,
+                        IsCorrect = opt.IsCorrect
+                    });
+                }
+
+                var correctOption = qDto.Options.FirstOrDefault(o => o.IsCorrect);
+                bool isCorrect = correctOption != null && userOptionId.HasValue && userOptionId.Value == correctOption.Id;
+
+                total++;
+                if (isCorrect) correct++;
+
+                qList.Add(qDto);
+            }
+
+            dto.Questions = qList;
+            dto.Total = total;
+            dto.Correct = correct;
+            dto.Percentage = total > 0 ? (int)Math.Round((double)correct / total * 100) : 0;
+
+            return dto;
         }
     }
 }

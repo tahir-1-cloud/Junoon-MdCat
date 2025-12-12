@@ -56,6 +56,9 @@ namespace StudyApp.API.Data
             modelBuilder.Entity<ContactMessage>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<TestResult>().HasQueryFilter(x => !x.IsDeleted);
 
+            modelBuilder.Entity<StudentAttempt>()
+            .HasIndex(a => new { a.PaperId, a.StudentId })
+            .IsUnique();
 
             // --- ensure Paper -> Question -> Option cascade ---
             modelBuilder.Entity<Question>()

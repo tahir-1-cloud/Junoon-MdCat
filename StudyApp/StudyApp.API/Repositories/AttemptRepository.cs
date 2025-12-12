@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using StudyApp.API.Dto;
 
 namespace StudyApp.API.Repositories
 {
@@ -191,5 +192,55 @@ namespace StudyApp.API.Repositories
             _context.StudentAttempts.Update(attempt);
             await _context.SaveChangesAsync();
         }
+
+
+        public async Task<AttemptEntity?> GetAttemptWithQuestionsAsync(int attemptId)
+        {
+            var attempt = await _context.StudentAttempts
+                .Where(a => a.Id == attemptId)
+                .Select(a => new AttemptEntity
+                {
+                    AttemptId = a.Id,
+                    StudentId = a.StudentId,
+                    Status = a.Status,
+                    DurationMinutes = a.Paper.DurationMinutes,
+                    AttemptedOn = a.AttemptedOn,
+
+                    // Saved answers
+                    SavedAnswers = _context.StudentAnswers
+                        .Where(sa => sa.StudentAttemptId == a.Id)
+                        .Select(sa => new SavedAnswerEntity
+                        {
+                            QuestionId = sa.QuestionId,
+                            SelectedOptionId = sa.SelectedOptionId
+                        })
+                        .ToList(),
+
+                    // Paper questions
+                    Questions = a.Paper.Questions
+                        .Select(q => new QuestionEntity
+                        {
+                            QuestionId = q.Id,
+                            Title = q.Title,
+                            Explanation = q.Description,
+
+                            // Options inside each question
+                            Options = q.Options
+                                .Select(o => new OptionEntity
+                                {
+                                    OptionId = o.Id,
+                                    OptionText = o.OptionText,
+                                    IsCorrect = o.IsCorrect
+                                })
+                                .ToList()
+                        })
+                        .ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            return attempt;
+        }
+
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StudyApp.API.Domain.Entities;
 using StudyApp.API.Models;
+using StudyApp.API.Services.Implementations;
 using StudyApp.API.Services.Interfaces;
 
 namespace StudyApp.API.Controllers
@@ -199,6 +200,7 @@ namespace StudyApp.API.Controllers
             long studentId = long.Parse(User.FindFirst("id")?.Value ?? "0");
             try
             {
+                studentId = 3; //temp hardcode for testing
                 await _service.SaveAnswerAsync(model, studentId);
                 return Ok();
             }
@@ -214,10 +216,33 @@ namespace StudyApp.API.Controllers
             long studentId = long.Parse(User.FindFirst("id")?.Value ?? "0");
             try
             {
+                studentId = 3; //temp hardcode for testing
                 await _service.CompleteAttemptAsync(model, studentId);
                 return Ok();
             }
             catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("{attemptId:int}/result")]
+        public async Task<IActionResult> GetAttemptResult(int attemptId)
+        {
+            long studentId = long.Parse(User.FindFirst("id")?.Value ?? "0");
+
+            try
+            {
+                studentId = 3; //temp hardcode for testing
+                var result = await _service.GetAttemptResultAsync(attemptId, studentId);
+                if (result == null) return NotFound();
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
