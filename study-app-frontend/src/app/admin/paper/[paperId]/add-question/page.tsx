@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import {toast} from "sonner"
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 import {
   QuestionCreateDto,
@@ -24,7 +25,11 @@ export default function AddQuestionPage() {
   const [loading, setLoading] = useState(false);
 
   // NOTE: you were using a fixed paperId in the original file — keeping that
-  const paperId = 1;
+  // const paperId = 1;
+ 
+     const params = useParams();
+     const paperId = Number(params.paperId);
+
 
   const updateOption = (idx: number, data: Partial<OptionDto>) => {
     const updated = [...options];
