@@ -231,7 +231,7 @@ const handleDelete = async (id: number) => {
                     height="320"    // smaller video height
                     src={selectedVideoUrl}
                     className="rounded-lg"
-                    allowFullScreen
+               
                 />
             )}
         </Modal>

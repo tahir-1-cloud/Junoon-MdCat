@@ -61,7 +61,7 @@ export default function HomeLectures() {
                     className="w-full h-full"
                     src={`${embedUrl}?autoplay=1&modestbranding=1&rel=0`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
+                    
                   />
                 ) : (
                   <>
