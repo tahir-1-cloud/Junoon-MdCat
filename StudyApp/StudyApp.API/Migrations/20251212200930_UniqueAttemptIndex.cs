@@ -10,15 +10,15 @@ namespace StudyApp.API.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            //migrationBuilder.DropIndex(
-            //    name: "IX_StudentAttempts_PaperId",
-            //    table: "StudentAttempts");
+            migrationBuilder.DropIndex(
+                name: "IX_StudentAttempts_PaperId",
+                table: "StudentAttempts");
 
-            //migrationBuilder.CreateIndex(
-            //    name: "IX_StudentAttempts_PaperId_StudentId",
-            //    table: "StudentAttempts",
-            //    columns: new[] { "PaperId", "StudentId" },
-            //    unique: true);
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentAttempts_PaperId_StudentId",
+                table: "StudentAttempts",
+                columns: new[] { "PaperId", "StudentId" },
+                unique: true);
         }
 
         /// <inheritdoc />
