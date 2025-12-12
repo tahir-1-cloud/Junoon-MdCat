@@ -6,6 +6,7 @@ import { ColumnsType } from 'antd/es/table';
 import { getLectures,deleteLecturesbyId  } from '@/services/lecturesServices';
 import { LecturesModel } from '@/types/lecturesModel';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import {toast} from "sonner"
 
 export default function LecturesPage() {
     const [lectures, setLectures] = useState<LecturesModel[]>([]);
@@ -55,9 +56,12 @@ const handleDelete = async (id: number) => {
         const updated = lectures.filter(l => l.id !== id);
         setLectures(updated);
         setFilteredLectures(updated);
+         toast.success("Lecture deleted successfully");
 
     } catch (error) {
+        toast.error("Failed to delete lecture:");
         console.error("Failed to delete lecture:", error);
+
     }
 };
 

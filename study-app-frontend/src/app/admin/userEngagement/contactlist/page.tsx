@@ -6,6 +6,7 @@ import { ColumnsType } from 'antd/es/table';
 import { getAllContactInfo, deleteContactInfo } from '@/services/publicServices';
 import { contactus } from '@/types/contactus';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import {toast} from "sonner"
 
 export default function ContactListPage() {
     const [contacts, setContacts] = useState<contactus[]>([]);
@@ -46,7 +47,8 @@ export default function ContactListPage() {
     const handleDeleteContact = async (contactId: number) => {
         try {
             await deleteContactInfo(contactId);
-            message.success('Contact deleted successfully.');
+            toast.success("Contact info deleted successfull");
+
             // Remove from local state
             const updated = contacts.filter(c => c.id !== contactId);
             setContacts(updated);
@@ -55,7 +57,9 @@ export default function ContactListPage() {
                 c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 c.message.toLowerCase().includes(searchTerm.toLowerCase())
             ));
+
         } catch (error: any) {
+            toast.error("Failed deleting contact");
             console.error('Failed deleting contact', error);
             const msg = error?.response?.data ?? error?.message ?? 'Failed to delete contact';
             message.error(typeof msg === 'string' ? msg : 'Failed to delete contact');

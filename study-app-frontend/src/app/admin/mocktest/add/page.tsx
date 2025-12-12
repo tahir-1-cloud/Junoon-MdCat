@@ -38,7 +38,7 @@ export default function AddMockPaperForm() {
         try {
             await addMockPaper(mock);
             toast.success("Mock-Paper added successfully!");
-
+            
             // Reset form
             setTitle('');
             setTestDate(undefined);

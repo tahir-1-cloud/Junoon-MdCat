@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 import { TrashIcon } from '@heroicons/react/24/outline';
+import {toast} from "sonner"
+import Link from "next/link";
+
 import {
   QuestionCreateDto,
   OptionDto,
@@ -81,7 +84,7 @@ export default function AddQuestionPage() {
       await QuestionService.addQuestion(dto);
 
       // success feedback
-      alert('Question saved successfully!');
+      toast.success('Question saved successfully!');
 
       // reset form
       setTitle('');
@@ -106,10 +109,29 @@ export default function AddQuestionPage() {
   return (
     <div className="min-h-screen  py-12 px-4 sm:px-8">
       {/* Header */}
-      <div className="max-w-4xl mx-auto mb-8 text-center">
-        <h1 className="text-4xl font-extrabold text-indigo-700 mb-2">✏️ Create a New Question</h1>
-        <p className="text-gray-600 text-lg">Add a title, description, and multiple-choice options below.</p>
+     <div className="max-w-4xl mx-auto mb-8">
+      {/* Back Button */}
+      <div className="mb-4">
+      <Link
+        href="/admin/paper/listing"
+        className="px-4 py-2 rounded-lg font-semibold text-blue-900"
+        style={{ backgroundColor: '#ffdf20' }}
+      >
+        ← Back
+      </Link>
+    </div>
+
+      {/* Title + Description */}
+      <div className="text-center">
+        <h1 className="text-4xl font-extrabold text-indigo-700 mb-2">
+          ✏️ Create a New Question
+        </h1>
+        <p className="text-gray-600 text-lg">
+          Add a title, description, and multiple-choice options below.
+        </p>
       </div>
+     </div>
+
 
       {/* Card */}
       <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-2xl p-8 border border-indigo-100">
@@ -193,7 +215,7 @@ export default function AddQuestionPage() {
             <button
               type="button"
               onClick={addOption}
-              className="mt-4 px-5 py-2.5 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold hover:from-indigo-600 hover:to-purple-600 shadow-md transition-transform transform hover:-translate-y-0.5"
+              className="mt-4 px-5 py-2.5 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow-md transition-transform transform hover:-translate-y-0.5"
             >
               + Add Another Option
             </button>
@@ -204,7 +226,7 @@ export default function AddQuestionPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xl font-bold hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="w-full py-3.5 rounded-xl bg-blue-600 text-white text-xl font-bold hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all duration-300"
             >
               {loading ? 'Saving...' : '✨ Save Question'}
             </button>

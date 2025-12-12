@@ -6,6 +6,7 @@ import { ColumnsType } from 'antd/es/table';
 import { getAllSubscriber, deleteSubscriber } from '@/services/publicServices';
 import { subscriber } from '@/types/contactus';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import {toast} from "sonner"
 
 export default function SubscriberListPage() {
     const [subscribers, setSubscribers] = useState<subscriber[]>([]);
@@ -44,7 +45,7 @@ export default function SubscriberListPage() {
     const handleDeleteSubscriber = async (subscriberId: number) => {
         try {
             await deleteSubscriber(subscriberId);
-            message.success('Subscriber deleted successfully.');
+            toast.success('Subscriber deleted successfully.');
             // Remove from local state
             const updated = subscribers.filter(s => s.id !== subscriberId);
             setSubscribers(updated);
@@ -52,6 +53,7 @@ export default function SubscriberListPage() {
                 s.email.toLowerCase().includes(searchTerm.toLowerCase())
             ));
         } catch (error: any) {
+            toast.error('Failed deleting subscriber');
             console.error('Failed deleting subscriber', error);
             const msg = error?.response?.data ?? error?.message ?? 'Failed to delete subscriber';
             message.error(typeof msg === 'string' ? msg : 'Failed to delete subscriber');

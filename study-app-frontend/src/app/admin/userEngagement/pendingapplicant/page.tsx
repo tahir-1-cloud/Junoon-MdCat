@@ -6,7 +6,7 @@ import { ColumnsType } from 'antd/es/table';
 import { studentEnrollmentlist } from '@/types/studentEnrollment';
 import { getAllEnrollStudent, deleteEnrollStudent } from '@/services/enrollmentService';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-
+import {toast} from "sonner"
 export default function Page() {
     const [students, setStudents] = useState<studentEnrollmentlist[]>([]);
     const [filteredStudents, setFilteredStudents] = useState<studentEnrollmentlist[]>([]);
@@ -52,7 +52,8 @@ export default function Page() {
     const handleDeleteStudent = async (studentId: number) => {
         try {
             await deleteEnrollStudent(studentId);
-            message.success('Student deleted successfully.');
+            toast.success("Enrolled Student deleted successfull");
+
             const updated = students.filter(s => s.id !== studentId);
             setStudents(updated);
             setFilteredStudents(updated.filter(s =>
@@ -64,6 +65,7 @@ export default function Page() {
                 s.status.toLowerCase().includes(searchTerm.toLowerCase())
             ));
         } catch (error: any) {
+            toast.error('Failed deleting student');
             console.error('Failed deleting student', error);
             const msg = error?.response?.data ?? error?.message ?? 'Failed to delete student';
             message.error(typeof msg === 'string' ? msg : 'Failed to delete student');

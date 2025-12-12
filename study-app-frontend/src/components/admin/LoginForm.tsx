@@ -10,6 +10,8 @@ import { useRouter } from "next/navigation";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/16/solid";
 import { loginStudent } from "@/services/userService";
 import axios from "axios";
+import {toast} from "sonner"
+
 
 export default function LoginInForm() {
   const router = useRouter();
@@ -17,7 +19,6 @@ export default function LoginInForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -31,9 +32,9 @@ export default function LoginInForm() {
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const message = err.response?.data || err.message || "Login failed";
-        alert(typeof message === "string" ? message : "Login failed");
+        toast.error(typeof message === "string" ? message : "Login failed");
       } else {
-        alert("An unexpected error occurred");
+        toast.error("An unexpected error occurred");
       }
     }
   };
