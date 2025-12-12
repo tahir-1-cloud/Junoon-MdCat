@@ -108,8 +108,11 @@
 
 
 // Program.cs
+using CloudinaryDotNet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
+using StudyApp.API.Cloudinary;
 using StudyApp.API.Data;
 using StudyApp.API.Domain.Interfaces;
 using StudyApp.API.Hubs;
@@ -124,6 +127,28 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+//cloudinary cloud for video and image upload
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings"));
+
+builder.Services.AddSingleton(x =>
+{
+    var config = x.GetRequiredService<IOptions<CloudinarySettings>>().Value;
+    return new CloudinaryDotNet.Cloudinary(
+        new CloudinaryDotNet.Account(
+            config.CloudName,
+            config.ApiKey,
+            config.ApiSecret
+        )
+    );
+});
+
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 524_288_000; // 500 MB
 });
 
 // SignalR
@@ -146,6 +171,8 @@ builder.Services.AddScoped<ISubscriberRepository, SubscriberRepository>();
 builder.Services.AddScoped<ILecturesRepository, LecturesRepository>();
 builder.Services.AddScoped<ITestResultRepository, TestResultRepository>();
 builder.Services.AddScoped<IAttemptRepository, AttemptRepository>();
+builder.Services.AddScoped<IStudentLectureRepository, StudentLectureRepository>();
+
 
 // Register Services
 builder.Services.AddScoped<IAuthenticationServices, AuthenticationServices>();
@@ -162,6 +189,8 @@ builder.Services.AddScoped<ISubscriberServices, SubscriberServices>();
 builder.Services.AddScoped<ILectureServices, LectureServices>();
 builder.Services.AddScoped<ITestResultServices, TestResultServices>();
 builder.Services.AddScoped<IAttemptService, AttemptService>();
+builder.Services.AddScoped<IStudentLectureService, StudentLectureService>();
+
 
 // Mapster config
 MappingConfig.RegisterMappings();

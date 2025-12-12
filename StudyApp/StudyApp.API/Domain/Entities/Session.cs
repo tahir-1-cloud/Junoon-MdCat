@@ -9,5 +9,6 @@ namespace StudyApp.API.Domain.Entities
         public DateTime SessionYear { get; set; }
 
         public ICollection<PaperSession> PaperSessions { get; set; } = new List<PaperSession>();
+        public ICollection<ApplicationUser> Students { get; set; } = new List<ApplicationUser>();
     }
 }

@@ -16,5 +16,7 @@
 
         public int SessionId { get; set; }
         public Session Session { get; set; }
+
+        public ICollection<StudentLecture> StudentLectures { get; set; } = new List<StudentLecture>();
     }
 }

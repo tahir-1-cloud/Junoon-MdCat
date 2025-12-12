@@ -35,6 +35,10 @@ namespace StudyApp.API.Data
 
         public DbSet<TestResultAnswer> TestResultAnswers { get; set; }
 
+        public DbSet<StudentLecture> StudentLectures { get; set; }
+        public DbSet<Lecturedetails> Lecturedetails { get; set; }  
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -51,9 +55,6 @@ namespace StudyApp.API.Data
             modelBuilder.Entity<Subscriber>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<ContactMessage>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<TestResult>().HasQueryFilter(x => !x.IsDeleted);
-
-
-
 
 
             // --- ensure Paper -> Question -> Option cascade ---
@@ -124,8 +125,28 @@ namespace StudyApp.API.Data
                         .WithMany()
                         .HasForeignKey(a => a.SelectedOptionId)
                         .OnDelete(DeleteBehavior.Restrict);  // FIXED
+
+
+                // --- Lecture -> StudentLecture ----------------
+                    modelBuilder.Entity<StudentLecture>()
+                        .HasOne(sl => sl.Students)
+                        .WithMany(s => s.StudentLectures)
+                        .HasForeignKey(sl => sl.StudentId)
+                        .OnDelete(DeleteBehavior.Restrict);  // SAFE
+
+                    modelBuilder.Entity<StudentLecture>()
+                        .HasOne(sl => sl.Lecturedetails)
+                        .WithMany(l => l.StudentLectures)
+                        .HasForeignKey(sl => sl.LecturedetailId)
+                        .OnDelete(DeleteBehavior.Restrict);  // SAFE
+
+                    // Avoid duplicate assignment:
+                    modelBuilder.Entity<StudentLecture>()
+                        .HasIndex(sl => new { sl.StudentId, sl.LecturedetailId })
+                        .IsUnique();
+
         }
-        
+
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

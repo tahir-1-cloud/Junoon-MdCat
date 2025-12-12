@@ -39,6 +39,8 @@ namespace StudyApp.API.Mappings
             TypeAdapterConfig<MockOption, MockQuestionModel>.NewConfig()
              .TwoWays();
 
+          //  TypeAdapterConfig<Lecturedetails, LectureDetailsModel>.NewConfig()
+          //.TwoWays();
         }
     }
 }
