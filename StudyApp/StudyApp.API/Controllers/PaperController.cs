@@ -148,7 +148,7 @@ namespace StudyApp.API.Controllers
         {
             try
             {
-                studentId = 3; //temp hardcode for testing
+                //studentId = 3; //temp hardcode for testing
                 var data = await _paperServices.GetAssignedPapersForStudent(studentId);
                 return Ok(data);
             }
@@ -162,7 +162,7 @@ namespace StudyApp.API.Controllers
         {
             try
             {
-                studentId = 3;
+                //studentId = 3;
                 var attempts = await _paperServices.GetAttemptsForStudent(studentId);
                 return Ok(attempts);
             }
@@ -176,6 +176,7 @@ namespace StudyApp.API.Controllers
         {
             try
             {
+                //model.StudentId = 3;
                 var resp = await _paperServices.StartAttempt(model);
                 return Ok(resp);
             }
@@ -216,7 +217,7 @@ namespace StudyApp.API.Controllers
             long studentId = long.Parse(User.FindFirst("id")?.Value ?? "0");
             try
             {
-                studentId = 3; //temp hardcode for testing
+                //studentId = 3; //temp hardcode for testing
                 await _service.SaveAnswerAsync(model, studentId);
                 return Ok();
             }
@@ -232,7 +233,7 @@ namespace StudyApp.API.Controllers
             long studentId = long.Parse(User.FindFirst("id")?.Value ?? "0");
             try
             {
-                studentId = 3; //temp hardcode for testing
+                //studentId = 3; //temp hardcode for testing
                 await _service.CompleteAttemptAsync(model, studentId);
                 return Ok();
             }
@@ -249,7 +250,7 @@ namespace StudyApp.API.Controllers
 
             try
             {
-                studentId = 3; //temp hardcode for testing
+                //studentId = 3; //temp hardcode for testing
                 var result = await _service.GetAttemptResultAsync(attemptId, studentId);
                 if (result == null) return NotFound();
                 return Ok(result);
@@ -268,7 +269,7 @@ namespace StudyApp.API.Controllers
         public async Task<IActionResult> GetMyAttempts()
         {
             long studentId = long.Parse(User.FindFirst("id")?.Value ?? "0");
-            studentId = 3;
+            //studentId = 3;
             var attempts = await _service.GetAttemptsForStudentAsync(studentId);
             return Ok(attempts);
         }

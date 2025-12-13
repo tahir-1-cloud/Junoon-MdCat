@@ -228,9 +228,14 @@ if (app.Environment.IsDevelopment())
 {
     // Show detailed exception page in development to help debug negotiate errors
     app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "StudyApp API v1");
+    c.RoutePrefix = "swagger"; // /swagger
+});
 
 // IMPORTANT: Routing -> CORS -> Authentication/Authorization -> MapHub/Controllers
 app.UseRouting();

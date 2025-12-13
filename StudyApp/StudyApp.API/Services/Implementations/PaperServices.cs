@@ -151,7 +151,7 @@ namespace StudyApp.API.Services.Implementations
             if (completed != null)
                 throw new Exception("You have already completed this test.");
 
-             model.StudentId = 3;
+             
 
             var newAttempt = new StudentAttempt
             {
