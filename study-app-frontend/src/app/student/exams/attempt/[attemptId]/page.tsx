@@ -435,9 +435,9 @@ export default function AttemptRunner({ params }: { params: { attemptId?: string
 
                 <div>
                   <Space>
-                    <Button onClick={handlePrevious}>Previous</Button>
+                    {/* <Button onClick={handlePrevious}>Previous</Button> */}
                     <Button onClick={handleNext}>Next</Button>
-                    <Button onClick={() => { if (q.questionId) toggleMark(q.questionId); }}>{isMarked ? 'Unmark' : 'Mark'}</Button>
+                    {/* <Button onClick={() => { if (q.questionId) toggleMark(q.questionId); }}>{isMarked ? 'Unmark' : 'Mark'}</Button> */}
                     <Button type="primary" onClick={handleSubmit}>Submit</Button>
                   </Space>
                 </div>

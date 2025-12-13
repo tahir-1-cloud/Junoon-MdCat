@@ -5,6 +5,7 @@ using StudyApp.API.Domain.Entities;
 using StudyApp.API.Domain.Interfaces;
 using StudyApp.API.Dto;
 using StudyApp.API.Models;
+using StudyApp.API.Repositories;
 using StudyApp.API.Services.Interfaces;
 
 namespace StudyApp.API.Services.Implementations
@@ -192,6 +193,26 @@ namespace StudyApp.API.Services.Implementations
             dto.Percentage = total > 0 ? (int)Math.Round((double)correct / total * 100) : 0;
 
             return dto;
+        }
+
+        public async Task<List<AttemptListItemDto>> GetAttemptsForStudentAsync(long studentId)
+        {
+            var attempts = await _repo.GetAttemptsForStudentAsync(studentId);
+
+            // Map repository projection → DTO
+            return attempts.Select(a => new AttemptListItemDto
+            {
+                AttemptId = a.AttemptId,
+                PaperId = a.PaperId,
+                PaperTitle = a.PaperTitle,
+                AttemptedOn = a.AttemptedOn,
+                Status = a.Status,
+                Correct = a.Correct,
+                Total = a.Total,
+                Percentage = a.Total > 0
+                    ? (int)Math.Round((double)a.Correct / a.Total * 100)
+                    : 0
+            }).ToList();
         }
     }
 }

@@ -13,7 +13,8 @@ namespace StudyApp.API.Domain.Interfaces
         Task SaveAnswerAsync(StudentAnswer answer);
         Task<List<StudentAnswer>> GetAnswersForAttemptAsync(int attemptId);
         Task UpdateAttemptAsync(StudentAttempt attempt);
-
         Task<AttemptEntity?> GetAttemptWithQuestionsAsync(int attemptId);
+
+        Task<List<StudentAttemptSummaryEntity>> GetAttemptsForStudentAsync(long studentId);
     }
 }

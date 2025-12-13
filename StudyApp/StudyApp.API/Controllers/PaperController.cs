@@ -134,6 +134,7 @@ namespace StudyApp.API.Controllers
         {
             try
             {
+                studentId = 3; //temp hardcode for testing
                 var data = await _paperServices.GetAssignedPapersForStudent(studentId);
                 return Ok(data);
             }
@@ -147,6 +148,7 @@ namespace StudyApp.API.Controllers
         {
             try
             {
+                studentId = 3;
                 var attempts = await _paperServices.GetAttemptsForStudent(studentId);
                 return Ok(attempts);
             }
@@ -247,6 +249,16 @@ namespace StudyApp.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("student")]
+        public async Task<IActionResult> GetMyAttempts()
+        {
+            long studentId = long.Parse(User.FindFirst("id")?.Value ?? "0");
+            studentId = 3;
+            var attempts = await _service.GetAttemptsForStudentAsync(studentId);
+            return Ok(attempts);
+        }
+
 
         #endregion
 

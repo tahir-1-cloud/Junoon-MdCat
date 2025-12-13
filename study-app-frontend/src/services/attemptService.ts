@@ -42,6 +42,18 @@ export interface AttemptResultDto {
   questions: QuestionResult[];
 }
 
+export interface AttemptListItemDto {
+  attemptId: number;
+  paperId: number;
+  paperTitle: string;
+  attemptedOn: string;
+  status: string;
+  correct: number;
+  total: number;
+  percentage: number;
+}
+
+
 
 export async function getAttempt(attemptId: number): Promise<AttemptDto> {
   const { data } = await axiosInstance.get<AttemptDto>(`/Paper/GetAttempt/${attemptId}`);
@@ -64,3 +76,9 @@ export async function getAttemptResult(attemptId: number): Promise<AttemptResult
   const { data } = await axiosInstance.get<AttemptResultDto>(`/paper/GetAttemptResult/${attemptId}/result`);
   return data;
 }
+
+export async function getMyAttempts(): Promise<AttemptListItemDto[]> {
+  const { data } = await axiosInstance.get<AttemptListItemDto[]>('/attempt/student');
+  return data;
+}
+

@@ -241,6 +241,35 @@ namespace StudyApp.API.Repositories
             return attempt;
         }
 
+        public async Task<List<StudentAttemptSummaryEntity>> GetAttemptsForStudentAsync(long studentId)
+        {
+            return await _context.StudentAttempts
+                .Where(a => a.StudentId == studentId && !a.IsDeleted)
+                .Select(a => new StudentAttemptSummaryEntity
+                {
+                    AttemptId = a.Id,
+                    PaperId = a.PaperId,
+                    PaperTitle = a.Paper.Title,
+                    AttemptedOn = a.AttemptedOn,
+                    Status = a.Status,
+
+                    // total questions in paper
+                    Total = a.Paper.Questions.Count(),
+
+                    // correct answers count
+                    Correct = _context.StudentAnswers
+                        .Where(sa =>
+                            sa.StudentAttemptId == a.Id &&
+                            sa.SelectedOptionId != null &&
+                            a.Paper.Questions
+                                .SelectMany(q => q.Options)
+                                .Any(o => o.Id == sa.SelectedOptionId && o.IsCorrect)
+                        )
+                        .Count()
+                })
+                .OrderByDescending(a => a.AttemptedOn)
+                .ToListAsync();
+        }
 
     }
 }

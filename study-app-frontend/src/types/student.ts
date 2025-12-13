@@ -19,6 +19,7 @@ export interface AssignedPaperDto {
   sessionTitle?: string | null;
   availableFrom?: string | null;
   availableTo?: string | null;
+   isAttempted: boolean;
 }
 
 export interface StudentAttemptDto {

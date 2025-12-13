@@ -105,4 +105,27 @@ namespace StudyApp.API.Models
     {
         public int AttemptId { get; set; }
     }
+
+    public class AttemptListItemDto
+    {
+        public int AttemptId { get; set; }
+        public int PaperId { get; set; }
+        public string PaperTitle { get; set; } = string.Empty;
+        public DateTime AttemptedOn { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public int Correct { get; set; }
+        public int Total { get; set; }
+        public int Percentage { get; set; }
+    }
+
+    public class StudentAttemptSummaryEntity
+    {
+        public int AttemptId { get; set; }
+        public int PaperId { get; set; }
+        public string PaperTitle { get; set; } = string.Empty;
+        public DateTime AttemptedOn { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public int Correct { get; set; }
+        public int Total { get; set; }
+    }
 }

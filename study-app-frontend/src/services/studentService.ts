@@ -9,6 +9,7 @@ export interface AssignedPaperDto {
   sessionTitle?: string | null;
   availableFrom?: string | null; // optional window
   availableTo?: string | null;
+  isAttempted: boolean;
 }
 
 export interface StartAttemptResponse {
@@ -45,6 +46,11 @@ export interface CompleteAttemptModel {
   answers?: Array<{ questionId: number; selectedOptionId?: number | null; freeText?: string }>;
 }
 
+export interface GetStudentAttemptDto {
+  id: number;
+  paperId: number;
+  status: string;
+}
 
 export async function getAssignedPapersForStudent(studentId: number): Promise<AssignedPaperDto[]> {
   const { data } = await axiosInstance.get<AssignedPaperDto[]>(`/Paper/GetAssignedPapers/${studentId}`);
@@ -92,5 +98,14 @@ export async function completeAttempt(payload: CompleteAttemptModel): Promise<St
 
 export async function saveAnswer(payload: { attemptId: number; studentId: number; questionId: number; selectedOptionId?: number | null; freeText?: string }) {
   const { data } = await axiosInstance.post(`/Student/SaveAnswer`, payload);
+  return data;
+}
+
+export async function getMyAttempts(
+  studentId: number
+): Promise<GetStudentAttemptDto[]> {
+  const { data } = await axiosInstance.get<GetStudentAttemptDto[]>(
+    `/Paper/GetAttempts/${studentId}`
+  );
   return data;
 }

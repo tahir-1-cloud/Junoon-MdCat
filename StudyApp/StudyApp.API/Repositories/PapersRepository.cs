@@ -80,28 +80,61 @@ namespace StudyApp.API.Repositories
 
 
 
+        //public async Task<List<AssignedPaperDto>> GetAssignedPapersForStudent(int studentId)
+        //{
+
+        //    var q = from ps in _context.PaperSessions
+        //            join p in _context.Papers on ps.PaperId equals p.Id
+        //            join s in _context.Sessions on ps.SessionId equals s.Id
+        //            select new AssignedPaperDto
+        //            {
+        //                Id = p.Id,
+        //                Title = p.Title,
+        //                TestConductedOn = p.TestConductedOn,
+        //                SessionId = s.Id,
+        //                SessionTitle = s.Title,
+        //                AvailableFrom = null,
+        //                AvailableTo = null
+        //            };
+
+        //    var list = await q.ToListAsync();
+
+        //    var unique = list.GroupBy(x => x.Id).Select(g => g.First()).ToList();
+        //    return unique;
+        //}
+
         public async Task<List<AssignedPaperDto>> GetAssignedPapersForStudent(int studentId)
         {
-            
-            var q = from ps in _context.PaperSessions
-                    join p in _context.Papers on ps.PaperId equals p.Id
-                    join s in _context.Sessions on ps.SessionId equals s.Id
-                    select new AssignedPaperDto
-                    {
-                        Id = p.Id,
-                        Title = p.Title,
-                        TestConductedOn = p.TestConductedOn,
-                        SessionId = s.Id,
-                        SessionTitle = s.Title,
-                        AvailableFrom = null,
-                        AvailableTo = null
-                    };
+            var attemptedPaperIds = await _context.StudentAttempts
+                .Where(a => a.StudentId == studentId)
+                .Select(a => a.PaperId)
+                .ToListAsync();
+
+            var q =
+                from ps in _context.PaperSessions
+                join p in _context.Papers on ps.PaperId equals p.Id
+                join s in _context.Sessions on ps.SessionId equals s.Id
+                select new AssignedPaperDto
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    TestConductedOn = p.TestConductedOn,
+                    SessionId = s.Id,
+                    SessionTitle = s.Title,
+                    AvailableFrom = null,
+                    AvailableTo = null,
+
+                    IsAttempted = attemptedPaperIds.Contains(p.Id)
+                };
 
             var list = await q.ToListAsync();
 
-            var unique = list.GroupBy(x => x.Id).Select(g => g.First()).ToList();
-            return unique;
+            return list
+                .GroupBy(x => x.Id)
+                .Select(g => g.First())
+                .ToList();
         }
+
 
         public async Task<List<StudentAttemptDto>> GetAttemptsForStudent(int studentId)
         {
@@ -161,169 +194,114 @@ namespace StudyApp.API.Repositories
 
         public async Task<StudentPaperDto?> GetStudentPaperAsync(int paperId)
         {
-            IQueryable<StudyApp.API.Domain.Entities.Paper> paperQuery =
+            long studentId = 3; // TEMP (replace with auth later)
+
+            IQueryable<Paper> paperQuery =
                 _context.Papers
-                    .AsNoTracking()
+                    .AsNoTracking() // ✅ read-only
                     .Where(p => p.Id == paperId)
                     .Include(p => p.Questions)
                         .ThenInclude(q => q.Options);
 
-            var paperType = typeof(StudyApp.API.Domain.Entities.Paper);
+            var paperType = typeof(Paper);
             var hasPaperSessionsNav = paperType.GetProperty("PaperSessions") != null;
+
             if (hasPaperSessionsNav)
             {
-                paperQuery = paperQuery.Include("PaperSessions");
+                paperQuery = paperQuery.Include(p => p.PaperSessions);
             }
 
             var paper = await paperQuery.FirstOrDefaultAsync();
             if (paper == null) return null;
+
+            // ✅ AsNoTracking – existence check only
+            var isAttempted = await _context.StudentAttempts
+                .AsNoTracking()
+                .AnyAsync(a =>
+                    a.PaperId == paperId &&
+                    a.StudentId == studentId &&
+                    a.Status == "Completed" &&
+                    !a.IsDeleted
+                );
 
             var dto = new StudentPaperDto
             {
                 Id = paper.Id,
                 Title = paper.Title ?? string.Empty,
                 TestConductedOn = paper.TestConductedOn,
+                DurationMinutes = paper.DurationMinutes,
                 AvailableFrom = null,
                 AvailableTo = null,
-                DurationMinutes = null,
-                Questions = paper.Questions?.Select(q => new StudentQuestionDto
+
+                // ✅ key flag
+                IsAttempted = isAttempted,
+
+                Questions = paper.Questions.Select(q => new StudentQuestionDto
                 {
                     Id = q.Id,
                     Title = q.Title ?? string.Empty,
                     Description = q.Description,
-                    Options = q.Options?.Select(o => new StudentOptionDto
+                    Options = q.Options.Select(o => new StudentOptionDto
                     {
                         Id = o.Id,
                         OptionText = o.OptionText ?? string.Empty,
                         IsCorrect = null
-                    }).ToList() ?? new List<StudentOptionDto>()
-                }).ToList() ?? new List<StudentQuestionDto>()
+                    }).ToList()
+                }).ToList()
             };
 
-            if (hasPaperSessionsNav)
+            if (hasPaperSessionsNav && paper.PaperSessions != null)
             {
-                var paperSessionsProp = paper.GetType().GetProperty("PaperSessions");
-                var rawPaperSessions = paperSessionsProp?.GetValue(paper) as System.Collections.IEnumerable;
-                if (rawPaperSessions != null)
+                dto.PaperSessions = new List<StudentPaperSessionDto>();
+
+                foreach (var ps in paper.PaperSessions)
                 {
-                    dto.PaperSessions = new List<StudentPaperSessionDto>();
-                    var sessionIds = new List<int>();
-
-                    foreach (var ps in rawPaperSessions)
+                    dto.PaperSessions.Add(new StudentPaperSessionDto
                     {
-                        if (ps == null) continue;
-                        var psType = ps.GetType();
-                        var paperIdValProp = psType.GetProperty("PaperId");
-                        var sessionIdValProp = psType.GetProperty("SessionId");
-                        var sessionNavProp = psType.GetProperty("Session");
+                        PaperId = ps.PaperId,
+                        SessionId = ps.SessionId,
+                        SessionTitle = ps.Session?.Title
+                    });
+                }
 
-                        if (paperIdValProp == null || sessionIdValProp == null) continue;
+                var first = dto.PaperSessions.FirstOrDefault();
+                if (first != null)
+                {
+                    dto.SessionId = first.SessionId;
+                    dto.SessionTitle = first.SessionTitle;
+                }
 
-                        var paperIdVal = (int)paperIdValProp.GetValue(ps)!;
-                        var sessionIdVal = (int)sessionIdValProp.GetValue(ps)!;
+                // ✅ fill missing titles (still read-only)
+                var missingSessionIds = dto.PaperSessions
+                    .Where(ps => ps.SessionId > 0 && string.IsNullOrEmpty(ps.SessionTitle))
+                    .Select(ps => ps.SessionId)
+                    .Distinct()
+                    .ToList();
 
-                        string? sessionTitle = null;
+                if (missingSessionIds.Count > 0)
+                {
+                    var sessions = await _context.Sessions
+                        .AsNoTracking() // ✅ read-only
+                        .Where(s => missingSessionIds.Contains(s.Id))
+                        .Select(s => new { s.Id, s.Title })
+                        .ToListAsync();
 
-                        if (sessionNavProp != null)
-                        {
-                            var sessionObj = sessionNavProp.GetValue(ps);
-                            if (sessionObj != null)
-                            {
-                                var sessionTitleProp = sessionObj.GetType().GetProperty("Title");
-                                if (sessionTitleProp != null)
-                                {
-                                    sessionTitle = sessionTitleProp.GetValue(sessionObj)?.ToString();
-                                }
-                            }
-                        }
+                    var lookup = sessions.ToDictionary(s => s.Id, s => s.Title);
 
-                        dto.PaperSessions.Add(new StudentPaperSessionDto
-                        {
-                            PaperId = paperIdVal,
-                            SessionId = sessionIdVal,
-                            SessionTitle = sessionTitle
-                        });
-
-                        if (sessionIdVal > 0) sessionIds.Add(sessionIdVal);
-                    }
-
-                    var missingSessionIds = dto.PaperSessions
-                        .Where(ps => ps != null && string.IsNullOrEmpty(ps.SessionTitle) && ps.SessionId > 0)
-                        .Select(ps => ps.SessionId)
-                        .Distinct()
-                        .ToList();
-
-                    if (missingSessionIds.Count > 0)
+                    foreach (var ps in dto.PaperSessions)
                     {
-                        var sessions = await _context.Sessions
-                            .AsNoTracking()
-                            .Where(s => missingSessionIds.Contains(s.Id))
-                            .Select(s => new { s.Id, s.Title })
-                            .ToListAsync();
-
-                        var sessionLookup = sessions.ToDictionary(s => s.Id, s => s.Title);
-
-                        foreach (var ps in dto.PaperSessions)
+                        if (string.IsNullOrEmpty(ps.SessionTitle) &&
+                            lookup.TryGetValue(ps.SessionId, out var title))
                         {
-                            if (ps == null) continue;
-                            if (ps.SessionId > 0 && string.IsNullOrEmpty(ps.SessionTitle) && sessionLookup.TryGetValue(ps.SessionId, out var title))
-                            {
-                                ps.SessionTitle = title;
-                            }
+                            ps.SessionTitle = title;
                         }
                     }
-
-                    var first = dto.PaperSessions.FirstOrDefault(ps => ps != null);
-                    if (first != null)
-                    {
-                        dto.SessionId = first.SessionId;
-                        dto.SessionTitle = first.SessionTitle;
-                    }
                 }
-            }
-            else
-            {
-                var sessionIdProp = paper.GetType().GetProperty("SessionId");
-                if (sessionIdProp != null)
-                {
-                    var sidObj = sessionIdProp.GetValue(paper);
-                    if (sidObj != null && int.TryParse(sidObj.ToString(), out var sid) && sid > 0)
-                    {
-                        dto.SessionId = sid;
-                        var sessionEntity = await _context.Sessions
-                            .AsNoTracking()
-                            .Where(s => s.Id == sid)
-                            .Select(s => new { s.Id, s.Title })
-                            .FirstOrDefaultAsync();
-                        dto.SessionTitle = sessionEntity?.Title;
-                    }
-                }
-            }
-
-            var durationProp = paper.GetType().GetProperty("DurationMinutes");
-            if (durationProp != null)
-            {
-                var dur = durationProp.GetValue(paper);
-                if (dur != null && int.TryParse(dur.ToString(), out var dval))
-                    dto.DurationMinutes = dval;
-            }
-
-            var availableFromProp = paper.GetType().GetProperty("AvailableFrom");
-            if (availableFromProp != null)
-            {
-                var af = availableFromProp.GetValue(paper);
-                if (af is DateTime dtaf) dto.AvailableFrom = dtaf;
-            }
-
-            var availableToProp = paper.GetType().GetProperty("AvailableTo");
-            if (availableToProp != null)
-            {
-                var at = availableToProp.GetValue(paper);
-                if (at is DateTime dtat) dto.AvailableTo = dtat;
             }
 
             return dto;
         }
+
 
 
     }

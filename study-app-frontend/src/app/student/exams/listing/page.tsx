@@ -1,8 +1,7 @@
-// src/app/student/tests/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Table, Button, Space, Tag, Spin, message, Modal } from 'antd';
+import { Table, Button, Space, Tag, Spin, message, Modal,Typography,Divider } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -11,9 +10,9 @@ import {
   startAttempt as startAttemptService,
   getAttemptsForStudent,
 } from '@/services/studentService';
-import type { AssignedPaperDto, StudentAttemptDto} from '@/types/student';
-import type { StartAttemptResponse} from '@/services/studentService';
+import type { AssignedPaperDto, StudentAttemptDto } from '@/types/student';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+const { Title, Text, Paragraph } = Typography;
 
 function getStudentId(): number {
   return Number(process.env.NEXT_PUBLIC_TEST_STUDENT_ID ?? 1);
@@ -61,11 +60,18 @@ export default function StudentAssignedTestsPage() {
   };
 
   const getAttemptForPaper = (paperId: number) =>
-    attempts.find((a) => Number(a.paperId) === Number(paperId)) ?? null;
+    attempts.find(a => Number(a.paperId) === Number(paperId)) ?? null;
 
   async function handleStart(paperId: number) {
+    const assignedRow = assigned.find(p => p.id === paperId);
+
+    // 🛡️ SAFETY CHECK using isAttempted (authoritative)
+    if (assignedRow?.isAttempted) {
+      message.info('You have already completed this test.');
+      return;
+    }
+
     const now = new Date();
-    const assignedRow = assigned.find((p) => p.id === paperId);
     if (assignedRow) {
       if (assignedRow.availableFrom && new Date(assignedRow.availableFrom) > now) {
         message.warning('This test is not open yet.');
@@ -80,29 +86,39 @@ export default function StudentAssignedTestsPage() {
     Modal.confirm({
       title: 'Start Test?',
       icon: <ExclamationCircleOutlined />,
-      content: 'Timer will begin immediately. Are you sure you want to start?',
+      content: (
+        <div>
+          <Paragraph strong>Please read the rules carefully.</Paragraph>
+          <ul style={{ paddingLeft: 18 }}>
+            <li>Only <strong>one attempt</strong> is allowed.</li>
+            <li>Once submitted, you cannot re-attempt.</li>
+            <li>Do not refresh or open multiple tabs.</li>
+          </ul>
+          <Divider />
+        </div>
+      ),
       okText: 'Start',
       cancelText: 'Cancel',
       onOk: async () => {
         try {
           setStarting(paperId);
-          //const resp = await startAttemptService({ paperId, studentId }) as StartAttemptResponse;
+
           const resp = await startAttemptService({ paperId, studentId });
-          if (!resp || !resp.attemptId) {
-            // use server message if available, otherwise fallback text
-            message.error(resp?.message ?? 'Failed to start attempt');
+
+          if (!resp?.attemptId) {
+            message.error('Failed to start attempt');
             return;
           }
 
           message.success('Test started!');
           router.push(`/student/exams/attempt/${resp.attemptId}`);
-        } catch (err: unknown) {
+        } catch (err: any) {
           console.error(err);
-          if (err instanceof Error) {
-            message.error(err.message ?? 'Could not start attempt');
-          } else {
-            message.error('Could not start attempt');
-          }
+          const serverMsg =
+            err?.response?.data ||
+            err?.message ||
+            'Could not start attempt';
+          message.warning(String(serverMsg));
         } finally {
           setStarting(null);
         }
@@ -117,14 +133,12 @@ export default function StudentAssignedTestsPage() {
   const columns: ColumnsType<AssignedPaperDto> = [
     {
       title: '#',
-      key: 'index',
       width: 60,
       render: (_: any, __: AssignedPaperDto, idx: number) => idx + 1,
     },
     {
       title: 'Title',
       dataIndex: 'title',
-      key: 'title',
       render: (t, r) => (
         <div>
           <div className="font-medium text-gray-800">{t}</div>
@@ -135,12 +149,10 @@ export default function StudentAssignedTestsPage() {
     {
       title: 'Test Date',
       dataIndex: 'testConductedOn',
-      key: 'testConductedOn',
-      render: (d) => (d ? new Date(d).toLocaleString() : '--'),
+      render: d => (d ? new Date(d).toLocaleString() : '--'),
     },
     {
       title: 'Window',
-      key: 'window',
       render: (_, r) => {
         if (!r.availableFrom && !r.availableTo) return 'Always available';
         return (
@@ -153,32 +165,33 @@ export default function StudentAssignedTestsPage() {
     },
     {
       title: 'Status',
-      key: 'status',
       render: (_, r) => {
+        if (r.isAttempted) return <Tag color="success">Completed</Tag>;
+
         const att = getAttemptForPaper(r.id);
-        if (!att) return <Tag color="default">Not started</Tag>;
-        if (att.status === 'InProgress') return <Tag color="processing">In Progress</Tag>;
-        if (att.status === 'Completed') return <Tag color="success">Completed</Tag>;
-        return <Tag>{att.status}</Tag>;
+        if (att?.status === 'InProgress') return <Tag color="processing">In Progress</Tag>;
+
+        return <Tag>Not started</Tag>;
       },
     },
     {
       title: 'Action',
-      key: 'action',
       render: (_, r) => {
         const att = getAttemptForPaper(r.id);
 
         const now = new Date();
         const startsLater = r.availableFrom ? new Date(r.availableFrom) > now : false;
         const ended = r.availableTo ? new Date(r.availableTo) < now : false;
-        const disabled = Boolean(startsLater || ended);
+
+        const startDisabled =
+          r.isAttempted || startsLater || ended;
 
         return (
           <Space size="small">
-            {!att && (
+            {!r.isAttempted && !att && (
               <Button
                 type="primary"
-                disabled={disabled}
+                disabled={startDisabled}
                 loading={starting === r.id}
                 onClick={() => handleStart(r.id)}
               >
@@ -187,13 +200,13 @@ export default function StudentAssignedTestsPage() {
             )}
 
             {att?.status === 'InProgress' && (
-              <Button type="primary" loading={starting === r.id} onClick={() => handleResume(att.id)}>
+              <Button type="primary" onClick={() => handleResume(att.id)}>
                 Resume
               </Button>
             )}
 
-            {att?.status === 'Completed' && (
-              <Link href={`/student/result/${att.id}`}>
+            {r.isAttempted && att && (
+              <Link href={`/student/exams/results/${att.id}`}>
                 <Button>Result</Button>
               </Link>
             )}
@@ -212,9 +225,7 @@ export default function StudentAssignedTestsPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-6 flex justify-center">
       <div className="w-full max-w-5xl bg-white rounded-2xl shadow-md p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">📘 Assigned Tests</h1>
-        </div>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">📘 Assigned Tests</h1>
 
         {isBusy ? (
           <div className="flex justify-center py-20">
@@ -226,14 +237,6 @@ export default function StudentAssignedTestsPage() {
             dataSource={assigned}
             rowKey="id"
             pagination={{ pageSize: 10 }}
-            className="border border-gray-200 rounded-lg"
-            locale={{
-              emptyText: (
-                <div className="py-12 text-gray-500">
-                  No assigned tests.
-                </div>
-              ),
-            }}
           />
         )}
       </div>

@@ -33,6 +33,7 @@ export interface StudentPaperDto {
   durationMinutes?: number | null;
   questions: StudentQuestionDto[];
   paperSessions?: StudentPaperSessionDto[];
+  isAttempted: boolean;
 }
 
 

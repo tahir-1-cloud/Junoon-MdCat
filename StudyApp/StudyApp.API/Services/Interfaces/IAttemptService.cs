@@ -12,10 +12,10 @@ namespace StudyApp.API.Services.Interfaces
         Task<bool> TryJoinAttemptAsync(int attemptId, long studentId, string connectionId);
         Task LeaveAttemptAsync(int attemptId, string connectionId);
         Task RegisterHeartbeatAsync(int attemptId, string connectionId);
-
         Task NotifyForceJoinAsync(int attemptId, long studentId, string connectionId);
-
         Task<AttemptResultDto?> GetAttemptResultAsync(int attemptId, long requestingStudentId);
+
+        Task<List<AttemptListItemDto>> GetAttemptsForStudentAsync(long studentId);
 
     }
 }
