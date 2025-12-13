@@ -125,6 +125,20 @@ namespace StudyApp.API.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllAttemptsAdmin()
+        {
+            var data = await _paperServices.GetAllAttemptsForAdminAsync();
+            return Ok(data);
+        }
+
+        [HttpGet("{attemptId:int}/result")]
+        public async Task<IActionResult> GetAttemptResultAdmin(int attemptId)
+        {
+            var result = await _paperServices.GetAttemptResultAsync(attemptId, 0);
+            if (result == null) return NotFound();
+            return Ok(result);
+        }
 
 
         #region Student Paper Actions

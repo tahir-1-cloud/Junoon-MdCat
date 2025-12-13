@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using StudyApp.API.Data;
 using StudyApp.API.Domain.Entities;
 using StudyApp.API.Domain.Interfaces;
+using StudyApp.API.Dto;
 using StudyApp.API.Models;
 
 namespace StudyApp.API.Repositories
@@ -77,6 +79,56 @@ namespace StudyApp.API.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<AdminAttemptListDto>> GetAllAttemptsForAdminAsync()
+        {
+            return await _context.StudentAttempts
+                .AsNoTracking()
+                .Where(a => !a.IsDeleted)
+                .Include(a => a.Paper)
+                    .ThenInclude(p => p.PaperSessions)
+                        .ThenInclude(ps => ps.Session)
+                .Include(a => a.Student)
+                .Select(a => new AdminAttemptListDto
+                {
+                    AttemptId = a.Id,
+
+                    PaperId = a.PaperId,
+                    PaperTitle = a.Paper.Title ?? "",
+
+                    SessionId = a.Paper.PaperSessions
+                        .Select(ps => (int?)ps.SessionId)
+                        .FirstOrDefault(),
+
+                    SessionTitle = a.Paper.PaperSessions
+                        .Select(ps => ps.Session.Title)
+                        .FirstOrDefault(),
+
+                    StudentId = a.StudentId,
+                    StudentName = a.Student.FullName ?? a.Student.FullName ?? "",
+
+                    Status = a.Status,
+                    Score = a.Score,
+                    Percentage = (int)a.Score,
+
+                    AttemptedOn = a.AttemptedOn
+                })
+                .OrderByDescending(x => x.AttemptedOn)
+                .ToListAsync();
+        }
+
+        public async Task<StudentAttempt?> GetAttemptForResultAsync(int attemptId)
+        {
+            return await _context.StudentAttempts
+                .AsNoTracking()
+                .Include(a => a.Student)
+                .Include(a => a.Paper)
+                    .ThenInclude(p => p.Questions)
+                        .ThenInclude(q => q.Options)
+                .Include(a => a.StudentAnswers)
+                .FirstOrDefaultAsync(a =>
+                    a.Id == attemptId &&
+                    !a.IsDeleted);
+        }
 
 
 

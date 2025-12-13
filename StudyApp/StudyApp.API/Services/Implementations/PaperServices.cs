@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using StudyApp.API.Domain.Entities;
 using StudyApp.API.Domain.Interfaces;
+using StudyApp.API.Dto;
+using StudyApp.API.Mappings;
 using StudyApp.API.Models;
 using StudyApp.API.Services.Interfaces;
 
@@ -61,6 +63,23 @@ namespace StudyApp.API.Services.Implementations
             await _papersRepository.RemovePaperSession(entry);
         }
 
+        public async Task<List<AdminAttemptListDto>> GetAllAttemptsForAdminAsync()
+        {
+            return await _papersRepository.GetAllAttemptsForAdminAsync();
+        }
+
+        public async Task<AttemptResultDtoAdmin?> GetAttemptResultAsync(int attemptId, int studentId)
+        {
+            var attempt = await _papersRepository.GetAttemptForResultAsync(attemptId);
+
+            if (attempt == null)
+                return null;
+
+            if (attempt.Status != "Completed")
+                throw new InvalidOperationException("Attempt is not completed.");
+
+            return AttemptResultMapper.MapToDto(attempt);
+        }
 
 
 

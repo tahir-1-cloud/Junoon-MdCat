@@ -60,6 +60,12 @@ namespace StudyApp.API.Data
             .HasIndex(a => new { a.PaperId, a.StudentId })
             .IsUnique();
 
+            modelBuilder.Entity<StudentAttempt>()
+            .HasOne(a => a.Student)
+            .WithMany() // no back-navigation to avoid cycles
+            .HasForeignKey(a => a.StudentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
             // --- ensure Paper -> Question -> Option cascade ---
             modelBuilder.Entity<Question>()
                 .HasOne(q => q.Paper)

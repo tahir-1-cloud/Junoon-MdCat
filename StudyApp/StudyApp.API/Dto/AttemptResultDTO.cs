@@ -12,6 +12,33 @@
         public DateTime? AttemptedOn { get; set; }
         public List<QuestionResultDto> Questions { get; set; } = new();
     }
+    public class AttemptResultDtoAdmin
+    {
+        public int AttemptId { get; set; }
+        public long StudentId { get; set; }
+        public string Status { get; set; } = "";
+        public int Total { get; set; }
+        public int Correct { get; set; }
+        public int Percentage { get; set; }
+        public int? DurationMinutes { get; set; }
+        public DateTime? AttemptedOn { get; set; }
+        public List<AttemptQuestionResultDto> Questions { get; set; } = new();
+    }
+
+    public class AttemptQuestionResultDto
+    {
+        public int QuestionId { get; set; }
+        public string QuestionText { get; set; } = "";
+
+        public int? UserSelectedOptionId { get; set; }
+        public string? UserSelectedOptionText { get; set; }
+
+        public int CorrectOptionId { get; set; }
+        public string CorrectOptionText { get; set; } = "";
+
+        public bool IsCorrect { get; set; }
+    }
+
 
     public class QuestionResultDto
     {

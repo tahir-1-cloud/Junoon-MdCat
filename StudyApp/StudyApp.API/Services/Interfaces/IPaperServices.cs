@@ -1,4 +1,5 @@
 ﻿using StudyApp.API.Domain.Entities;
+using StudyApp.API.Dto;
 using StudyApp.API.Models;
 
 namespace StudyApp.API.Services.Interfaces
@@ -19,6 +20,10 @@ namespace StudyApp.API.Services.Interfaces
         Task<StudentAttemptDto?> GetAttemptById(int attemptId);
 
         Task<StudentPaperDto> GetStudentPaperAsync(int paperId);
+
+
+        Task<List<AdminAttemptListDto>> GetAllAttemptsForAdminAsync();
+        Task<AttemptResultDtoAdmin?> GetAttemptResultAsync(int attemptId, int studentId);
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using StudyApp.API.Domain.Entities;
+using StudyApp.API.Dto;
 using StudyApp.API.Models;
 
 namespace StudyApp.API.Domain.Interfaces
@@ -11,6 +12,8 @@ namespace StudyApp.API.Domain.Interfaces
         Task<PaperSession?> GetPaperSession(int paperId, int sessionId);
         Task RemovePaperSession(PaperSession entry);
 
+        Task<List<AdminAttemptListDto>> GetAllAttemptsForAdminAsync();
+        Task<StudentAttempt?> GetAttemptForResultAsync(int attemptId);
 
 
 

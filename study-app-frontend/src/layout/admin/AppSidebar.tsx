@@ -48,7 +48,11 @@ const navItems: NavItem[] = [
             },
             {
                 name: "Listing", path: "/admin/paper/listing", pro: false
-            }],
+            },
+            {
+                name: "Test Results", path: "/admin/paper/testresult", pro: false
+            }
+        ],
     },
      {
         icon: <ClipboardIcon className="w-5 h-5"/>,

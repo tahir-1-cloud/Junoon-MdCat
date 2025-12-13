@@ -35,7 +35,8 @@ namespace StudyApp.API.Models
         public int Id { get; set; }
         public int PaperId { get; set; }
         public Paper Paper { get; set; } = null!;
-        public long StudentId { get; set; }
+        public int StudentId { get; set; }
+        public ApplicationUser Student { get; set; } = null!;
         public DateTime AttemptedOn { get; set; }
         public DateTime? StartedAt { get; set; }
         public DateTime? CompletedAt { get; set; }
@@ -46,6 +47,8 @@ namespace StudyApp.API.Models
         public int? CreatedBy { get; set; }
         public string? ActiveConnectionId { get; set; }
         public bool IsActiveSession { get; set; } = false;
+        public List<StudentAnswer> StudentAnswers { get; set; } = new();
+
     }
 
     public class StudentAnswer : AuditEntity

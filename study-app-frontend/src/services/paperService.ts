@@ -36,6 +36,37 @@ export interface StudentPaperDto {
   isAttempted: boolean;
 }
 
+export interface AdminAttemptListDto {
+  attemptId: number;
+  paperId: number;
+  paperTitle: string;
+  sessionId?: number | null;
+  sessionTitle?: string | null;
+  studentId: number;
+  studentName: string;
+  status: string;
+  score: number;
+  percentage: number;
+  attemptedOn: string;
+}
+
+export interface AttemptResultDto {
+  attemptId: number;
+  studentId: number;
+  status: string;
+  total: number;
+  correct: number;
+  percentage: number;
+  durationMinutes?: number;
+  attemptedOn?: string;
+  questions: {
+    questionId: number;
+    questionText: string;
+    userSelectedOptionText?: string | null;
+    correctOptionText: string;
+    isCorrect: boolean;
+  }[];
+}
 
 
 export async function addPaper(paper: CreatePaperModel) {
@@ -93,3 +124,15 @@ export const getStudentPaper = async (paperId: number): Promise<StudentPaperDto>
   });
   return data;
 };
+
+export async function getAllStudentAttempts(): Promise<AdminAttemptListDto[]> {
+  const { data } = await axiosInstance.get<AdminAttemptListDto[]>(
+    '/Paper/GetAllAttemptsAdmin'
+  );
+  return data;
+}
+
+export async function getAttemptResultByAdmin(attemptId: number): Promise<AttemptResultDto> { const { data } = await axiosInstance.get<AttemptResultDto>
+(`/Paper/GetAttemptResultAdmin/${attemptId}/result`);
+  return data;
+}
